@@ -1,5 +1,5 @@
 <template>
-  <section id="our-services">
+  <div id="our-services">
     <div class="container">
       <div class="section-title">
         <h2>Our Services</h2>
@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>

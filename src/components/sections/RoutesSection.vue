@@ -12,10 +12,13 @@
             pleasure, we've got you covered. Our trips include popular destinations
             such as:
           </p> -->
-            <div class="route-card" v-for="(route, index) in routes" :key="index">
-              <h4>{{ route.name }}</h4>
-              <!-- <p>{{ route.description }}</p> -->
-            </div>
+          <div class="route-card" v-for="(route, index) in routes" :key="index">
+            <img :src="route.image" :alt="route.name" class="route-image" />
+            <h4>{{ route.name }}</h4>
+          </div>
+
+
+
           </div>
           <div class="routes-map">
             <img src="@/assets/images/map-svg.svg" alt="Map of Routes" />
@@ -31,20 +34,25 @@
     data() {
       return {
         routes: [
-          { name: "Dar es Salaam", description: "Daily trips available" },
-          { name: "Morogoro", description: "Explore scenic travel" },
-          { name: "Moshi", description: "Perfect for business trips" },
-          { name: "Mwanza", description: "Comfortable long routes" },
-          { name: "Bukoba", description: "Experience the highlands" },
-          { name: "Mara", description: "Short trips available" },
-          { name: "Iringa", description: "Discover the lakeside" },
-          { name: "Mbeya", description: "Explore the countryside" },
-          { name: "Tunduma", description: "Explore the countryside" },
-        ],
+          { name: "Arusha", image: require('@/assets/images/arusha.jpg') },
+          { name: "Bukoba", image: require('@/assets/images/bukoba.jpg') },
+          { name: "Dar es Salaam", image: require('@/assets/images/Dest1.jpg') },
+          { name: "Iringa", image: require('@/assets/images/iringa.jpg') },
+          { name: "Mara", image: require('@/assets/images/mara.jpg') },
+          { name: "Mbeya", image: require('@/assets/images/mbeya.jpg') },
+          { name: "Morogoro", image: require('@/assets/images/morogoro.jpg') },
+          { name: "Moshi", image: require('@/assets/images/moshi.jpg') },
+          { name: "Mwanza", image: require('@/assets/images/mwanza.jpg') },
+          { name: "Tanga", image: require('@/assets/images/tanga.jpg') },
+          { name: "Tarime", image: require('@/assets/images/tarime.jpg') },
+          { name: "Tunduma", image: require('@/assets/images/tunduma.jpg') },
+        ]
       };
-    },
+    }
   };
   </script>
+  
+
   <style scoped>
   #our-trip {
       background-image: url('@/assets/images/hero-section-bg.jpg');
@@ -104,33 +112,36 @@
     justify-content: center;
     gap: 20px;
 }
-
 .route-card {
+    display: flex;
+    align-items: center;
     background: #ffffff;
     color: #b71c1c;
     border-radius: 12px;
-    padding: 20px;
-    width: 220px;
-    text-align: center;
+    padding: 15px;
+    width: 250px;
+    text-align: left;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .route-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.route-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 15px;
 }
 
 .route-card h4 {
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-    color: #d32f2f;
-}
-
-.route-card p {
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.4;
+    font-size: 1.2rem;
+    color: #000000;
+    margin: 0;
 }
 
 /* Keyframe Animation */
