@@ -1,0 +1,60 @@
+.search-section {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar {
+    display: flex; /* Flex layout to align items in a row */
+    gap: 10px;
+    background-color: #28ABE2;
+    padding: 20px;
+    border-radius: 8px;
+    flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+}
+
+.input-field, 
+.date-input, 
+.search-button {
+    height: 50px; /* Set uniform height */
+    flex: 1; /* Equal width for all elements */
+    border: none;
+    border-radius: 5px;
+    padding: 0 15px; /* Adjust horizontal padding */
+    font-size: 14px;
+    color: #000;
+    background-color: #fff;
+    min-width: 270px; /* Ensure a minimum width for smaller devices */
+}
+
+.date-input {
+    cursor: pointer;
+}
+
+.search-button {
+    background-color: #ff3d3d;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    flex: 0.5; /* Slightly smaller width for the button */
+}
+
+.search-button:hover {
+    background-color: #ff2a2a;
+}
+
+@media (max-width: 768px) {
+    .search-bar {
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .input-field, 
+    .date-input, 
+    .search-button {
+        width: 100%;
+        flex: 1!important; /* Full width on smaller screens */
+    }
+}
