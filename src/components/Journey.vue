@@ -11,66 +11,65 @@
                         <div class="row">
                             <div class="col-lg-10">
                             <h1 class="text-uppercase">Abood Bus Service Limited</h1>
-                            <p>Book your Trip Now</p>
+                            <p>Book Your Trip Now</p>
                             </div>
                         </div>
                         </div>
                     </div>
                     <div class="col-lg-12">
-                        <form @submit.prevent="handleSearch" class="search-bar">
-                            <div class="changecustomize" style="position: relative; display: flex; align-items: center; width: 100%;">
-                                <input
-                                type="text"
-                                v-model="departure"
-                                class="input-field"
-                                placeholder="Search or Select City"
-                                @input="filterDepartureOptions"
-                                @focus="filterDepartureOptions"
-                                />
-                                <!-- Departure Dropdown -->
-                                <ul v-if="showDepartureDropdown" class="custom-dropdown">
-                                <li
-                                    v-for="(option, index) in filteredDepartureOptions"
-                                    :key="index"
-                                    class="dropdown-item"
-                                    @click="selectDeparture(option)"
-                                >
-                                    {{ option.city }}
-                                </li>
-                                </ul>
-                            </div>
+                        <div class="search-container">
+                            <div class="search-card">
+                                <form @submit.prevent="handleSearch" class="search-bar">
+                                    <!-- Departure Input -->
+                                    <div class="input-wrapper">
+                                        <input
+                                            type="text"
+                                            v-model="departure"
+                                            class="input-field"
+                                            placeholder="Search or Select City"
+                                            @input="filterDepartureOptions"
+                                            @focus="filterDepartureOptions"
+                                        />
+                                        <ul v-if="showDepartureDropdown" class="custom-dropdown">
+                                            <li v-for="(option, index) in filteredDepartureOptions"
+                                                :key="index"
+                                                class="dropdown-item"
+                                                @click="selectDeparture(option)">
+                                                {{ option.city }}
+                                            </li>
+                                        </ul>
+                                    </div>
 
-                            <div class="changecustomize" style="position: relative; display: flex; align-items: center; width: 100%;">
-                                <!-- Destination Input -->
-                                <input
-                                type="text"
-                                v-model="destination"
-                                class="input-field"
-                                placeholder="Search or Select City"
-                                @input="filterDestinationOptions"
-                                @focus="filterDestinationOptions" 
-                                />
-                                <!-- Destination Dropdown -->
-                                <ul v-if="showDestinationDropdown" class="custom-dropdown">
-                                <li
-                                    v-for="(option, index) in filteredDestinationOptions"
-                                    :key="index"
-                                    class="dropdown-item"
-                                    @click="selectDestination(option)"
-                                >
-                                    {{ option.city }}
-                                </li>
-                                </ul>
-                            </div>
+                                    <!-- Destination Input -->
+                                    <div class="input-wrapper">
+                                        <input
+                                            type="text"
+                                            v-model="destination"
+                                            class="input-field"
+                                            placeholder="Search or Select City"
+                                            @input="filterDestinationOptions"
+                                            @focus="filterDestinationOptions"
+                                        />
+                                        <ul v-if="showDestinationDropdown" class="custom-dropdown">
+                                            <li v-for="(option, index) in filteredDestinationOptions"
+                                                :key="index"
+                                                class="dropdown-item"
+                                                @click="selectDestination(option)">
+                                                {{ option.city }}
+                                            </li>
+                                        </ul>
+                                    </div>
 
-                            <div class="date-container">
-                                <input type="date" v-model="date" class="input-field" required />
-                            </div>
+                                    <!-- Date Input -->
+                                    <div class="input-wrapper">
+                                        <input type="date" v-model="date" class="input-field date-input" required  :min="currentDate"/>
+                                    </div>
 
-                            <div>
-                                <button type="submit" class="search-button">Search</button>
+                                    <!-- Search Button -->
+                                    <button type="submit" class="search-button">Search</button>
+                                </form>
                             </div>
-                        </form>
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -78,11 +77,14 @@
             </div>
             </div>
         </div>
+        <div v-if="isLoading" class="bus-loading-overlay">
+            <div class="bus-loading-card">
+                <div class="bus-loading"></div>
+                <p>Loading...</p>
+            </div>
+        </div>
 
       <section id="bus-selection" class="bus-selection">
-        <!-- Loading Spinner -->
-        <div v-if="isLoading" class="loading">Loading...</div>
-        <div v-else>
             <div v-if="errorMessage" class="alert alert-warning text-center">
                 {{ errorMessage }}
             </div>
@@ -91,7 +93,8 @@
                     <div class="bus-list-content transition-section"
                         v-for="(bus, index) in busData"
                         :key="index"
-                        :class="{'col-lg-6': selectedBus === bus, 'col-lg-12': selectedBus !== bus, 'd-flex': selectedBus === bus}">
+                        :class="{'col-12': true}"
+                        @click="bookTicket(bus)">
                         
                         <div class="row w-100">
                             <div class="col-md-2">
@@ -264,167 +267,120 @@
                             </div>
                         </div>
 
-                        <!-- Seat Map Appears Next to Selected Bus -->
-                        <div v-if="selectedBus === bus" class="col-lg-6 seat-map-section">
-                            <div class="seat-map mx-5">
-                                <div class="row" style="margin-top: 25px; align-content: center; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;">
-                                    Basi : {{ data.bus_schedule.bus}}<br>
-                                    Muda wa kuondoka: {{ data.bus_schedule.departure_time }}<br>
-                                </div>
-                                <div class="row1" style="margin-top: 25px; display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
-                                    <!-- Icon and Text for Zinazopatikana -->
-                                    <div class="icon-container" style="text-align: center;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px"
-                                                viewBox="0 0 100 125" width="70" height="70" xml:space="preserve" style="padding: 10px; margin: 4px 4px; border-radius: 5px;">
-                                                <path d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204  
-                                                        c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043  
-                                                        c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086  
-                                                        c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422  
-                                                        c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432  
-                                                        c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394  
-                                                        c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086  
-                                                        C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797  
-                                                        c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076  
-                                                        c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027  
-                                                        c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227  
-                                                        C28.276,35.357,30.802,38.163,30.802,41.573z" fill="#FFFFFF" stroke="#000000" stroke-width="2" />
-                                            </svg>
-                                        <div>Zinazopatikana</div>
-                                    </div>
-
-                                    <!-- Icon and Text for Unazochagua -->
-                                    <div class="icon-container" style="text-align: center;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px"
-                                            viewBox="0 0 100 125" width="70" height="70" xml:space="preserve" style="padding: 10px; margin: 4px 4px; border-radius: 5px;">
-                                            <path d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204  
-                                                    c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043  
-                                                    c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086  
-                                                    c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422  
-                                                    c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432  
-                                                    c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394  
-                                                    c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086  
-                                                    C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797  
-                                                    c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076  
-                                                    c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027  
-                                                    c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227  
-                                                    C28.276,35.357,30.802,38.163,30.802,41.573z" fill="#28ABE2" stroke="#000000" stroke-width="2" />
-                                        </svg>
-                                        <div>Unazochagua</div>
-                                    </div>
-
-                                    <!-- Icon and Text for Haipatikani -->
-                                    <div class="icon-container" style="text-align: center;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px"
-                                                viewBox="0 0 100 125" width="70" height="70" xml:space="preserve" style="padding: 10px; margin: 4px 4px; border-radius: 5px;">
-                                                <path d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204  
-                                                        c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043  
-                                                        c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086  
-                                                        c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422  
-                                                        c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432  
-                                                        c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394  
-                                                        c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086  
-                                                        C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797  
-                                                        c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076  
-                                                        c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027  
-                                                        c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227  
-                                                        C28.276,35.357,30.802,38.163,30.802,41.573z" fill="#CB252B" stroke="#000000" stroke-width="2" />
-                                            </svg>
-                                        <div>Haipatikani</div>
-                                    </div>
-                                </div>
-                                <form
-                                        method="post"
-                                        enctype="multipart/form-data"
-                                        action=""
-                                        class="wow fadeInUp"
-                                        id="contact-form"
-                                        role="form"
-                                        data-wow-delay="0.8s"
-                                    > 
-                                    <div class="plane">
-                                        <div class="cockpit">
-                                            <h6 class="cockpit-heading">{{ data.bus_schedule.origin_city }} - {{ data.bus_schedule.destination_city }} ({{data.bus_schedule.via}} )
-                                            <br>
-                                            Chagua Siti</h6>
-                                            <!-- <div class="moving-text">
-                                                {{ data.bus_schedule.origin_city }} - {{ data.bus_schedule.destination_city }} ({{ data.bus_schedule.via }})
-                                            </div> -->
+                        <div v-if="selectedBus && selectedBus.bus_id === bus.bus_id" class="row seat-map-container">
+                            <!-- Left Side (Seat Map) -->
+                            <div class="col-12 col-md-6 mt-2">
+                                <div class="seat-map mx-md-3 p-3 border rounded shadow-sm bg-white">
+          
+                                    <div class="row1" style="margin-top: 25px; display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                                        <!-- Icon and Text for Zinazopatikana -->
+                                        <div class="icon-container" style="text-align: center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px"
+                                                    viewBox="0 0 100 125" width="70" height="70" xml:space="preserve" style="padding: 10px; margin: 4px 4px; border-radius: 5px;">
+                                                    <path d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204  
+                                                            c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043  
+                                                            c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086  
+                                                            c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422  
+                                                            c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432  
+                                                            c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394  
+                                                            c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086  
+                                                            C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797  
+                                                            c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076  
+                                                            c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027  
+                                                            c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227  
+                                                            C28.276,35.357,30.802,38.163,30.802,41.573z" fill="#FFFFFF" stroke="#000000" stroke-width="2" />
+                                                </svg>
+                                            <div>Zinazopatikana</div>
                                         </div>
-                                        <!-- <input type="hidden" name="schedule_id" :value="scheduleId" /> -->
-                                        <input type="hidden" name="from_city_id" :value="origin_city_id" />
-                                        <input type="hidden" name="to_city_id" :value="destination_city_id" />
-                                        <input type="hidden" name="bus_id" :value="busId" />
-                                        <ol class="cabin fuselage" v-if="data.seatMatrix.length">
-                                            <li class="row row--driver">
-                                                <ol class="seats driver-seats" type="A">
-                                                    <li class="seat driver-seat">
-                                                        <img src="@/assets/images/drive-wheel1.svg" alt="Driver Icon" class="driver-icon" />
-                                                    </li>
-                                                </ol>
-                                            </li>
-                                            <li v-for="(row, rowIndex) in data.seatMatrix" 
-                                                :key="'row-' + rowIndex" 
-                                                :class="'row row--' + (rowIndex + 1)">
-                                                <template v-if="rowIndex === 13">
-                                                    <ol class="seatsL" type="A">
-                                                        <li v-for="(seat, colIndex) in row" 
-                                                            :key="'seat-' + rowIndex + '-' + colIndex" 
-                                                            class="seatL">
-                                                            
-                                                            <template v-if="seat">
-                                                                <svg 
-                                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                                    version="1.1" 
-                                                                    x="0px" 
-                                                                    y="0px" 
-                                                                    viewBox="0 0 100 125" 
-                                                                    width="100" 
-                                                                    height="100" 
-                                                                    xml:space="preserve" 
-                                                                    :class="{'selected-seat': seat.selected, 'disabled-seat': seat.disabled}" 
-                                                                    @click="toggleSeatSelection(seat)">
-                                                                    
-                                                                    <path 
-                                                                        d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204
-                                                                        c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043
-                                                                        c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086
-                                                                        c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422
-                                                                        c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432
-                                                                        c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394
-                                                                        c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086
-                                                                        C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797
-                                                                        c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076
-                                                                        c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027
-                                                                        c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227
-                                                                        C28.276,35.357,30.802,38.163,30.802,41.573z" 
-                                                                        fill="#FFFFFF" 
-                                                                        stroke="#000000" 
-                                                                        stroke-width="2" />
-                                                                    <text x="50%" y="35%" font-size="14" text-anchor="middle" fill="black" font-family="Arial" dy=".3em">{{ seat.label }}</text>
-                                                                </svg>
-                                                            </template>
-                                                            <template v-else>
-                                                                <div class="empty-seat"></div>
-                                                            </template>
+    
+                                        <!-- Icon and Text for Unazochagua -->
+                                        <div class="icon-container" style="text-align: center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px"
+                                                viewBox="0 0 100 125" width="70" height="70" xml:space="preserve" style="padding: 10px; margin: 4px 4px; border-radius: 5px;">
+                                                <path d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204  
+                                                        c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043  
+                                                        c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086  
+                                                        c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422  
+                                                        c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432  
+                                                        c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394  
+                                                        c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086  
+                                                        C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797  
+                                                        c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076  
+                                                        c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027  
+                                                        c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227  
+                                                        C28.276,35.357,30.802,38.163,30.802,41.573z" fill="#28ABE2" stroke="#000000" stroke-width="2" />
+                                            </svg>
+                                            <div>Unazochagua</div>
+                                        </div>
+    
+                                        <!-- Icon and Text for Haipatikani -->
+                                        <div class="icon-container" style="text-align: center;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px"
+                                                    viewBox="0 0 100 125" width="70" height="70" xml:space="preserve" style="padding: 10px; margin: 4px 4px; border-radius: 5px;">
+                                                    <path d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204  
+                                                            c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043  
+                                                            c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086  
+                                                            c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422  
+                                                            c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432  
+                                                            c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394  
+                                                            c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086  
+                                                            C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797  
+                                                            c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076  
+                                                            c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027  
+                                                            c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227  
+                                                            C28.276,35.357,30.802,38.163,30.802,41.573z" fill="#CB252B" stroke="#000000" stroke-width="2" />
+                                                </svg>
+                                            <div>Haipatikani</div>
+                                        </div>
+                                    </div>
+                                    <form
+                                            method="post"
+                                            enctype="multipart/form-data"
+                                            action=""
+                                            class="wow fadeInUp"
+                                            id="contact-form"
+                                            role="form"
+                                            data-wow-delay="0.8s"
+                                        > 
+                                        <div class="plane">
+                                            <div class="cockpit">
+                                                <h6 class="cockpit-heading">{{ data.bus_schedule.origin_city }} - {{ data.bus_schedule.destination_city }} ({{data.bus_schedule.via}} )
+                                                <br>
+                                                Chagua Siti</h6>
+                                                <!-- <div class="moving-text">
+                                                    {{ data.bus_schedule.origin_city }} - {{ data.bus_schedule.destination_city }} ({{ data.bus_schedule.via }})
+                                                </div> -->
+                                            </div>
+                                            <!-- <input type="hidden" name="schedule_id" :value="scheduleId" /> -->
+                                            <input type="hidden" name="from_city_id" :value="origin_city_id" />
+                                            <input type="hidden" name="to_city_id" :value="destination_city_id" />
+                                            <input type="hidden" name="bus_id" :value="busId" />
+                                            <ol class="cabin fuselage" v-if="data.seatMatrix.length">
+                                                <li class="row row--driver">
+                                                    <ol class="seats driver-seats" type="A">
+                                                        <li class="seat driver-seat">
+                                                            <img src="@/assets/images/drive-wheel1.svg" alt="Driver Icon" class="driver-icon" />
                                                         </li>
                                                     </ol>
-                                                </template>
-                                                <template v-else>
-                                                    <ol class="seats" type="A">
-                                                        <li v-for="(seat, colIndex) in row" 
-                                                            :key="'seat-' + rowIndex + '-' + colIndex" 
-                                                            class="seat">
-                                                            
-                                                            <template v-if="seat">
-                                                                <template v-if="seat.value !== 'TOILET' && seat.value !== 'DOOR'">
+                                                </li>
+                                                <li v-for="(row, rowIndex) in data.seatMatrix" 
+                                                    :key="'row-' + rowIndex" 
+                                                    :class="'row row--' + (rowIndex + 1)">
+                                                    <template v-if="rowIndex === 13">
+                                                        <ol class="seatsL" type="A">
+                                                            <li v-for="(seat, colIndex) in row" 
+                                                                :key="'seat-' + rowIndex + '-' + colIndex" 
+                                                                class="seatL">
+                                                                
+                                                                <template v-if="seat">
                                                                     <svg 
                                                                         xmlns="http://www.w3.org/2000/svg" 
                                                                         version="1.1" 
                                                                         x="0px" 
                                                                         y="0px" 
                                                                         viewBox="0 0 100 125" 
-                                                                        width="200" 
-                                                                        height="200" 
+                                                                        width="100" 
+                                                                        height="100" 
                                                                         xml:space="preserve" 
                                                                         :class="{'selected-seat': seat.selected, 'disabled-seat': seat.disabled}" 
                                                                         @click="toggleSeatSelection(seat)">
@@ -449,44 +405,134 @@
                                                                     </svg>
                                                                 </template>
                                                                 <template v-else>
-                                                                <label :for="seat.id" :style="{backgroundColor: seat.value === 'TOILET' ? 'red' : 'red', color: 'white', fontSize: '8px'}">
-                                                                    {{ seat.label }}
-                                                                </label>
-                                                            </template>
-                                                            </template>
-                                                            <!-- <template v-else>
-                                                                <div class="empty-seat"></div>
-                                                            </template> -->
-                                                        </li>
-                                                    </ol>
-                                                </template>
-                                            </li>
-                                        </ol>
-                                    </div>
-                                    <div  
-                                        v-if="showProceedButton"  
-                                        class="row"  
-                                        style="margin-bottom: 10px; margin-top: 5px; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;"  
-                                    >  
-                                        <button  
-                                        type="button"  
-                                        class="form-control"  
-                                        style="background-color: #09496e; color: #f8f8f8; width: 200px; height: auto"  
-                                        id="cf-submit"  
-                                        @click="proceedToBooking"  
-                                        :disabled="seatisLoading" 
+                                                                    <div class="empty-seat"></div>
+                                                                </template>
+                                                            </li>
+                                                        </ol>
+                                                    </template>
+                                                    <template v-else>
+                                                        <ol class="seats" type="A">
+                                                            <li v-for="(seat, colIndex) in row" 
+                                                                :key="'seat-' + rowIndex + '-' + colIndex" 
+                                                                class="seat">
+                                                                
+                                                                <template v-if="seat">
+                                                                    <template v-if="seat.value !== 'TOILET' && seat.value !== 'DOOR'">
+                                                                        <svg 
+                                                                            xmlns="http://www.w3.org/2000/svg" 
+                                                                            version="1.1" 
+                                                                            x="0px" 
+                                                                            y="0px" 
+                                                                            viewBox="0 0 100 125" 
+                                                                            width="200" 
+                                                                            height="200" 
+                                                                            xml:space="preserve" 
+                                                                            :class="{'selected-seat': seat.selected, 'disabled-seat': seat.disabled}" 
+                                                                            @click="toggleSeatSelection(seat)">
+                                                                            
+                                                                            <path 
+                                                                                d="M76.531,40.06c-1.672,0-3.026,1.355-3.026,3.027v20.687c-0.187,0.063-0.374,0.116-0.555,0.204
+                                                                                c-0.053,0.025-2.895,1.385-7.482,2.655c-1.46-1.023-3.315-1.48-5.205-1.115c-6.939,1.345-13.673,1.363-20.605,0.043
+                                                                                c-1.869-0.353-3.704,0.095-5.154,1.101c-4.572-1.268-7.404-2.633-7.488-2.674c-0.17-0.084-0.345-0.134-0.519-0.194V43.086
+                                                                                c0-1.671-1.355-3.027-3.027-3.027c-1.671,0-3.026,1.355-3.026,3.027v24.717c0,0.145,0.022,0.282,0.042,0.422
+                                                                                c0.063,1.605,0.955,3.13,2.495,3.896c0.261,0.129,3.791,1.856,9.425,3.388c0.943,1.727,2.622,3.034,4.706,3.432
+                                                                                c4.262,0.811,8.542,1.223,12.722,1.223c4.277,0,8.659-0.43,13.022-1.275c2.061-0.399,3.722-1.69,4.664-3.394
+                                                                                c5.624-1.524,9.164-3.234,9.426-3.363c1.434-0.704,2.321-2.063,2.496-3.539c0.068-0.253,0.117-0.515,0.117-0.789V43.086
+                                                                                C79.558,41.415,78.203,40.06,76.531,40.06z M30.802,41.573l-0.001,19.084c0.602,0.234,1.334,0.506,2.211,0.797
+                                                                                c2.347-1.188,5.09-1.592,7.712-1.097c6.316,1.206,12.261,1.191,18.604-0.04c2.646-0.513,5.384-0.109,7.736,1.076
+                                                                                c0.808-0.27,1.493-0.521,2.068-0.742l0.01-19.079c0-3.41,2.526-6.215,5.801-6.708v-9.227c0-1.671-1.264-2.46-3.026-3.027
+                                                                                c0,0-9.594-2.775-21.756-2.775c-12.164,0-22.132,2.775-22.132,2.775c-1.718,0.534-3.027,1.355-3.027,3.027v9.227
+                                                                                C28.276,35.357,30.802,38.163,30.802,41.573z" 
+                                                                                fill="#FFFFFF" 
+                                                                                stroke="#000000" 
+                                                                                stroke-width="2" />
+                                                                            <text x="50%" y="35%" font-size="14" text-anchor="middle" fill="black" font-family="Arial" dy=".3em">{{ seat.label }}</text>
+                                                                        </svg>
+                                                                    </template>
+                                                                    <template v-else>
+                                                                    <label :for="seat.id" :style="{backgroundColor: seat.value === 'TOILET' ? 'red' : 'red', color: 'white', fontSize: '8px'}">
+                                                                        {{ seat.label }}
+                                                                    </label>
+                                                                </template>
+                                                                </template>
+                                                                <!-- <template v-else>
+                                                                    <div class="empty-seat"></div>
+                                                                </template> -->
+                                                            </li>
+                                                        </ol>
+                                                    </template>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                        <div  
+                                            v-if="showProceedButton"  
+                                            class="row"  
+                                            style="margin-bottom: 10px; margin-top: 5px; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;"  
                                         >  
-                                        <span v-if="seatisLoading">Loading...</span> <!-- Loading text -->  
-                                        <span v-else>PROCEED</span> <!-- Normal text -->  
-                                        </button>  
-                                    </div>  
-                                </form>
+                                            <button  
+                                            type="button"  
+                                            class="form-control"  
+                                            style="background-color: #09496e; color: #f8f8f8; width: 200px; height: auto"  
+                                            id="cf-submit"  
+                                            @click="proceedToBooking"  
+                                            :disabled="seatisLoading" 
+                                            >  
+                                            <span v-if="seatisLoading">Loading...</span> <!-- Loading text -->  
+                                            <span v-else>PROCEED</span> <!-- Normal text -->  
+                                            </button>  
+                                        </div>  
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mt-2">
+                                <div class="bus-info p-3 border rounded shadow-sm bg-light">
+                                    <ul class="nav nav-tabs">
+                                        <li class="nav-item">
+                                            <a 
+                                            class="nav-link" 
+                                            :class="{ active: activeTab === 'departure' }" 
+                                            @click="activeTab = 'departure'"
+                                            >
+                                            Departure City
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a 
+                                            class="nav-link" 
+                                            :class="{ active: activeTab === 'destination' }" 
+                                            @click="activeTab = 'destination'"
+                                            >
+                                            Destination
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <!-- Tab Content -->
+                                    <div class="tab-content p-3 border rounded shadow-sm bg-light">
+                                    <!-- Departure City Selection -->
+                                    <div v-if="activeTab === 'departure'">
+                                        <h5 class="text-center">Select Departure City</h5>
+                                        <div v-for="city in cities" :key="city">
+                                        <input type="radio" v-model="selectedDeparture" :value="city" id="departure-{{ city }}">
+                                        <label :for="'departure-' + city">{{ city }}</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Destination Selection -->
+                                    <div v-if="activeTab === 'destination'">
+                                        <h5 class="text-center">Select Destination</h5>
+                                        <div v-for="city in cities" :key="city">
+                                        <input type="radio" v-model="selectedDestination" :value="city" id="destination-{{ city }}">
+                                        <label :for="'destination-' + city">{{ city }}</label>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
       </section>
     </div>
   </template>
@@ -538,7 +584,11 @@
         selectedScheduleIds: [],
         seatsLimit: 0,
         showProceedButton: false,
-        seatisLoading: false
+        seatisLoading: false,
+        activeTab: 'departure', // Default tab
+      cities: ['City A', 'City B', 'City C', 'City D'], // Example cities
+      selectedDeparture: '',
+      selectedDestination: ''
       };
     },
     computed: {
@@ -644,6 +694,13 @@
             this.destination = selectedDestination.city;
         }
         },
+        handleSearch() {
+            if (!this.departureId || !this.destinationId || !this.date) {
+                alert("Please select valid departure, destination, and date.");
+                return;
+            }
+            this.fetchBusData();
+        },
         async fetchBusData() {
             this.isLoading = true;
             this.errorMessage = ""; 
@@ -734,13 +791,6 @@
             } finally {  
                 this.isLoading = false;  
             }  
-        },
-        handleSearch() {
-            if (!this.departureId || !this.destinationId || !this.date) {
-                alert("Please select valid departure, destination, and date.");
-                return;
-            }
-            this.fetchBusData();
         },
         buildMatrix() {
         if (!this.data || !Array.isArray(this.data.busSeats) || this.data.busSeats.length === 0) {
@@ -887,6 +937,9 @@
   };
   </script>
 <style scoped>
+.nav-tabs .nav-link {
+  cursor: pointer;
+}
 .st0 {
 fill: #3276c3;
 }
@@ -907,7 +960,7 @@ margin-left: 0;
 background-color: #fff;
 border-radius: 5px;
 box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-left: 0; /* Align dropdown content to the left */
+left: 0; 
 }
 
 .dropdown-item {
@@ -925,52 +978,51 @@ color: #333;
 .toggle-icon {
 color: #3498db; 
 }
-
-.loading {
-display: flex;
-justify-content: center;
-align-items: center;
-position: fixed;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-width: 70px; 
-height: 70px; 
-z-index: 9999; 
-background: rgba(255, 255, 255, 0.8); 
-border-radius: 10px; 
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-}
-.loading::before,
-.loading::after {
-content: '';
-position: absolute;
-border: 4px solid transparent;
-border-radius: 50%;
-animation: spin 1.5s linear infinite;
+.bus-loading-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 9999;
 }
 
-.loading::before {
-border-top: 4px solid #3498db;
-width: 100%;
-height: 100%;
+/* Small Loading Card */
+.bus-loading-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
 }
 
-.loading::after {
-border-bottom: 4px solid #CB252B;
-width: 70%;
-height: 70%;
-animation-duration: 1s;
+/* Loading Spinner */
+.bus-loading {
+    width: 50px;
+    height: 50px;
+    border: 4px solid transparent;
+    border-radius: 50%;
+    border-top: 4px solid #3498db;
+    border-bottom: 4px solid #CB252B;
+    animation: spin 1.5s linear infinite;
 }
 
+/* Loading Animation */
 @keyframes spin {
-0% {
-transform: rotate(0deg);
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
-100% {
-transform: rotate(360deg);
-}
-}
+
 
 
 @keyframes slideInFade {
@@ -1133,69 +1185,8 @@ margin-top: 4px;
 /*border-top: 1px solid rgba(212, 7, 70, .1);*/
 /*background: rgba(212, 7, 70, .05);*/
 }
-.transition-section {
-    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between; 
+.seat-map-container{
+    margin-top: 10px!important;
+    border-top: 1px solid #29abe2;
 }
-
-.seat-map-section {
-    animation: fadeIn 0.3s ease-in-out;
-    width: 100%; 
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateX(10px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-@media (max-width: 768px) {
-    .transition-section {
-        flex-direction: column; 
-    }
-
-    .seat-map-section {
-        width: 100%; 
-        margin-top: 10px;
-    }
-
-    .bus-list-content {
-        width: 100%; 
-    }
-
-    /* Ensuring column widths adapt properly */
-    .col-md-2, .col-md-10 {
-        width: 100%; /* Full width on smaller screens */
-    }
-}
-
-@media (min-width: 769px) {
-    .transition-section {
-        flex-wrap: nowrap; /* Prevent wrapping of the flex items on larger screens */
-    }
-
-    .seat-map-section {
-        width: 50%; /* Seat map takes half the width on larger screens */
-        margin-left: 10px;
-    }
-
-    .bus-list-content {
-        display: flex;
-        justify-content: space-between; /* Ensures left and right sections are placed side by side */
-        flex-wrap: nowrap;
-        width: 100%;
-    }
-
-    /* Adjusting internal columns to work better with flex */
-    .col-md-2 {
-        width: 20%; /* Adjust width to be smaller for the left side */
-    }
-
-    .col-md-10 {
-        width: 75%; /* Take up the majority of space on the left */
-    }
-}
-
-
 </style>

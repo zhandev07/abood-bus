@@ -1,60 +1,116 @@
-.search-section {
-    width: 100%;
-    max-width: 600px;
-    padding: 20px;
+/* Centering the form on the left side */
+.search-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 50px;
+}
+
+/* Card-style container */
+.search-card {
     background-color: #ffffff;
-    border-radius: 8px;
+    padding: 25px;
+    border-radius: 12px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    /* max-width: 800px; */
 }
 
+/* Styling for the form */
 .search-bar {
-    display: flex; /* Flex layout to align items in a row */
+    display: flex;
     gap: 10px;
-    background-color: #28ABE2;
-    padding: 20px;
+    flex-wrap: wrap;
+}
+
+/* Input wrapper for uniform styling */
+.input-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 160px; /* Ensures consistent size */
+}
+
+/* Input fields */
+.input-field {
+    width: 100%;
+    height: 50px;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
     border-radius: 8px;
-    flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+    background-color: #f9f9f9;
+    transition: border 0.3s ease, background 0.3s ease;
 }
 
-.input-field, 
-.date-input, 
-.search-button {
-    height: 50px; /* Set uniform height */
-    flex: 1; /* Equal width for all elements */
-    border: none;
-    border-radius: 5px;
-    padding: 0 15px; /* Adjust horizontal padding */
-    font-size: 14px;
-    color: #000;
+/* Hover & Focus states */
+.input-field:focus {
+    border-color: #007bff;
     background-color: #fff;
-    min-width: 270px; /* Ensure a minimum width for smaller devices */
+    outline: none;
 }
 
+/* Date picker customization */
 .date-input {
     cursor: pointer;
 }
 
+/* Search button */
 .search-button {
+    height: 50px;
+    font-size: 16px;
     background-color: #ff3d3d;
     color: #fff;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    text-align: center;
-    flex: 0.5; /* Slightly smaller width for the button */
+    transition: background 0.3s ease;
+    min-width: 120px;
 }
 
 .search-button:hover {
-    background-color: #ff2a2a;
+    background-color: #ff3d3d;
 }
 
-@media (max-width: 768px) {
+/* Dropdown styling */
+.custom-dropdown {
+    position: absolute;
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+    z-index: 10;
+}
+
+.dropdown-item {
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: #f1f1f1;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .search-container {
+        justify-content: center;
+        padding: 20px;
+        height: auto;
+    }
+
     .search-bar {
-        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        flex-direction: column;
     }
 
-    .input-field, 
-    .date-input, 
-    .search-button {
+    .input-field, .search-button {
         width: 100%;
-        flex: 1!important; /* Full width on smaller screens */
+        font-size: 14px;
+        height: 45px;
     }
 }
+
