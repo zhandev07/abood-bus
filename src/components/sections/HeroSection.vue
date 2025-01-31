@@ -238,6 +238,15 @@ export default {
     },
 
     searchBus() {
+      if (!this.departure || !this.destination || !this.date) {
+        let missingFields = [];
+        if (!this.departure) missingFields.push('Departure');
+        if (!this.destination) missingFields.push('Destination');
+        if (!this.date) missingFields.push('Date');
+        
+        alert('Please fill in the following fields: ' + missingFields.join(', '));
+        return;
+      }
       this.$router.push({
         name: "journeyPage",
         query: {
@@ -247,6 +256,7 @@ export default {
         },
       });
     },
+
   },
 
   mounted() {

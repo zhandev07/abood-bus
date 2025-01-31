@@ -103,13 +103,10 @@ h2 {
   transition: transform 0.3s ease-in-out;
 }
 
-.service-card:hover .abood-image-section img {
-  transform: scale(1.1); /* Zoom effect on hover */
-}
 
 .abood-text-section {
   padding: 20px;
-  background-color: #f7f7f7;
+  /* background-color: #f7f7f7; */
   text-align: center;
 }
 

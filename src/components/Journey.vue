@@ -62,7 +62,13 @@
 
                                     <!-- Date Input -->
                                     <div class="input-wrapper">
-                                        <input type="date" v-model="date" class="input-field date-input" required  :min="currentDate"/>
+                                        <input
+                                            type="date"
+                                            v-model="date"
+                                            class="input-field date-input"
+                                            required
+                                            :min="minDate"
+                                        />
                                     </div>
 
                                     <!-- Search Button -->
@@ -178,8 +184,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-3">
-                                        <div class="col-12">
-                                            <div class="bottom-box">
+                                            <div class="bottom-box" style="background-color: #f4f5f5; padding: 4px;">
                                                 <div class="bus-feature">
                                                     <div class="bus-f-details d-flex align-items-center">
                                                         <div class="bus-f-title">
@@ -263,14 +268,12 @@
                                                 BOOK TICKET
                                             </button>
                                             </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div v-if="selectedBus && selectedBus.bus_id === bus.bus_id" class="row seat-map-container">
-                            <!-- Left Side (Seat Map) -->
                             <div class="col-12 col-md-6 mt-2">
                                 <div class="seat-map mx-md-3 p-3 border rounded shadow-sm bg-white">
           
@@ -620,6 +623,13 @@
       departureDate() {
         return this.$route.query.departure_date || this.date;
       },
+      minDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = ("0" + (today.getMonth() + 1)).slice(-2); 
+      const day = ("0" + today.getDate()).slice(-2); 
+      return `${year}-${month}-${day}`;
+    },
       selectedSeatsData() {
         return {
             booking_id: this.selectedBookingIds,
@@ -1258,7 +1268,8 @@ display: block;
 
 .pricing .bottom-box {
 /*border-top: 1px solid rgb(61, 10, 10);*/
-background: rgba(30, 30, 30, .05);
+/* background: rgba(30, 30, 30, .05); */
+background: #f4f5f5!important;
 overflow: hidden;
 padding: 4px;
 }

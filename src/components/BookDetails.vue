@@ -370,7 +370,7 @@
           payload,
           { 
             headers: { "Content-Type": "application/json" },
-            timeout: 10000, // 10 seconds timeout to avoid hanging requests
+            timeout: 10000, 
           }
         );
 
