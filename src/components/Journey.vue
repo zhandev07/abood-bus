@@ -256,10 +256,12 @@
                                                 </div>
                                             </div>
                                             <div class="bottom-box-2 text-center mt-3">
-                                                <button class="btn btn-lg btn-danger w-100" 
+                                                <button 
+                                                v-if="!selectedBus || selectedBus.bus_id !== bus.bus_id" 
+                                                class="btn btn-lg btn-danger w-100" 
                                                 @click="bookTicket(bus)">
-                                                    BOOK TICKET
-                                                </button>
+                                                BOOK TICKET
+                                            </button>
                                             </div>
                                         </div>
                                     </div>
@@ -464,23 +466,6 @@
                                                 </li>
                                             </ol>
                                         </div>
-                                        <div  
-                                            v-if="showProceedButton"  
-                                            class="row"  
-                                            style="margin-bottom: 10px; margin-top: 5px; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;"  
-                                        >  
-                                            <button  
-                                            type="button"  
-                                            class="form-control"  
-                                            style="background-color: #09496e; color: #f8f8f8; width: 200px; height: auto"  
-                                            id="cf-submit"  
-                                            @click="proceedToBooking"  
-                                            :disabled="seatisLoading" 
-                                            >  
-                                            <span v-if="seatisLoading">Loading...</span> <!-- Loading text -->  
-                                            <span v-else>PROCEED</span> <!-- Normal text -->  
-                                            </button>  
-                                        </div>  
                                     </form>
                                 </div>
                             </div>
@@ -488,46 +473,78 @@
                                 <div class="bus-info p-3 border rounded shadow-sm bg-light">
                                     <ul class="nav nav-tabs">
                                         <li class="nav-item">
-                                            <a 
-                                            class="nav-link" 
-                                            :class="{ active: activeTab === 'departure' }" 
-                                            @click="activeTab = 'departure'"
-                                            >
-                                            Departure City
+                                            <a class="nav-link" 
+                                                :class="{ 'active-tab': activeTab === 'departure', 'inactive-tab': activeTab !== 'departure' }" 
+                                                @click="activeTab = 'departure'">
+                                                Kupandia
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a 
-                                            class="nav-link" 
-                                            :class="{ active: activeTab === 'destination' }" 
-                                            @click="activeTab = 'destination'"
-                                            >
-                                            Destination
+                                            <a class="nav-link" 
+                                                :class="{ 'active-tab': activeTab === 'destination', 'inactive-tab': activeTab !== 'destination' }" 
+                                                @click="activeTab = 'destination'">
+                                                Kushukia
                                             </a>
                                         </li>
                                     </ul>
 
                                     <!-- Tab Content -->
                                     <div class="tab-content p-3 border rounded shadow-sm bg-light">
-                                    <!-- Departure City Selection -->
-                                    <div v-if="activeTab === 'departure'">
-                                        <h5 class="text-center">Select Departure City</h5>
-                                        <div v-for="city in cities" :key="city">
-                                        <input type="radio" v-model="selectedDeparture" :value="city" id="departure-{{ city }}">
-                                        <label :for="'departure-' + city">{{ city }}</label>
+                                        <!-- Departure City Selection -->
+                                        <div v-if="activeTab === 'departure'">
+                                            <h5 class="text-center">Chagua sehemu ya Kupandia</h5>
+                                            <div class="city-list">
+                                                <div v-for="point in data.boarding_points" :key="point.id" class="city-item">
+                                                    <!-- Ensuring only one radio button can be selected in the departure tab -->
+                                                    <input 
+                                                        type="radio" 
+                                                        v-model="selectedDeparture" 
+                                                        :value="point.id" 
+                                                        :id="'departure-' + point.id"
+                                                        @change="handleDepartureSelection"
+                                                    >
+                                                    <label :for="'departure-' + point.id">{{ point.point_name }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Destination Selection -->
+                                        <div v-if="activeTab === 'destination'">
+                                            <h5 class="text-center">Chagua sehemu ya Kushukia</h5>
+                                            <div class="city-list">
+                                                <div v-for="point in data.dropping_points" :key="point.id" class="city-item">
+                                                    <!-- Ensuring only one radio button can be selected in the destination tab -->
+                                                    <input 
+                                                        type="radio" 
+                                                        v-model="selectedDestination" 
+                                                        :value="point.id" 
+                                                        :id="'destination-' + point.id"
+                                                        @change="handleDestinationSelection"
+                                                    >
+                                                    <label :for="'destination-' + point.id">{{ point.point_name }}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- Destination Selection -->
-                                    <div v-if="activeTab === 'destination'">
-                                        <h5 class="text-center">Select Destination</h5>
-                                        <div v-for="city in cities" :key="city">
-                                        <input type="radio" v-model="selectedDestination" :value="city" id="destination-{{ city }}">
-                                        <label :for="'destination-' + city">{{ city }}</label>
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
+                                    <div  
+                                        v-if="showProceedButton"  
+                                        class="row"  
+                                        style="margin-bottom: 10px; margin-top: 5px; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;"  
+                                    >  
+                                        <button  
+                                            type="button"  
+                                            class="form-control"  
+                                            style="background-color: #09496e; color: #f8f8f8; width: 200px; height: auto"  
+                                            id="cf-submit"  
+                                            @click="proceedToBooking"  
+                                            :disabled="seatisLoading || !selectedDeparture || !selectedDestination" 
+                                        >  
+                                            <span v-if="seatisLoading">Loading...</span>
+                                            <span v-else>PROCEED</span> 
+                                        </button>  
+                                    </div>  
+                                </div> 
                             </div>
                         </div>
                     </div>
@@ -539,6 +556,7 @@
   
   <script>
   import axios from 'axios';
+
   export default {
     name: "JourneyPage",
     data() {
@@ -576,7 +594,9 @@
                 origin_city_id: "",
                 destination_city_id: "",
                 via: ""
-            }
+            },
+            boarding_points: {},
+            dropping_points: {},
         },
         selectedBookingIds: [],
         selectedSeatIds: [],
@@ -585,10 +605,9 @@
         seatsLimit: 0,
         showProceedButton: false,
         seatisLoading: false,
-        activeTab: 'departure', // Default tab
-      cities: ['City A', 'City B', 'City C', 'City D'], // Example cities
-      selectedDeparture: '',
-      selectedDestination: ''
+        activeTab: 'departure', 
+        selectedDeparture: null,
+        selectedDestination: null, 
       };
     },
     computed: {
@@ -693,7 +712,7 @@
         if (selectedDestination) {
             this.destination = selectedDestination.city;
         }
-        },
+      },
         handleSearch() {
             if (!this.departureId || !this.destinationId || !this.date) {
                 alert("Please select valid departure, destination, and date.");
@@ -740,24 +759,25 @@
                 this.isLoading = false;
             }
         },
-        async bookTicket(bus) {  
-            if (this.selectedBus && this.selectedBus.bus_id === bus.bus_id) {  
-                console.log("You have already initiated booking for this bus.");  
+        async bookTicket(bus) {
+            if (this.selectedBus && this.selectedBus.bus_id === bus.bus_id) {
+                console.log("You have already initiated booking for this bus.");
                 return; 
-            } else {  
-                this.selectedBus = null;
+            } else {
+                this.selectedBus = bus;
                 this.data.busSeats = [];
                 this.data.bus_schedule = {};
+                this.data.boarding_points = {};
+                this.data.dropping_points = {};
                 this.seatsLimit = 0; 
                 this.showProceedButton = false;
-                this.selectedBookingIds= [];
-                this.selectedSeatIds= [];
-            }  
+                this.selectedBookingIds = [];
+                this.selectedSeatIds = [];
+            }
 
             console.log("Booking ticket for Bus:", bus);  
             this.isLoading = true;  
             this.errorMessage = "";  
-            this.selectedBus = bus; 
 
             const requestBody = {  
                 schedule_id: bus.schedule_id,  
@@ -779,7 +799,10 @@
                     console.log("Seat Data Retrieved Successfully:", result.data);  
                     this.data.busSeats = result.data.bus_seats;  
                     this.data.bus_schedule = result.data.bus_schedule || {};  
-                    this.seatsLimit = result.data.seats_limit || 0;   
+                    this.seatsLimit = result.data.seats_limit || 0;  
+                    this.data.boarding_points = result.data.boarding_points || {};
+                    this.data.dropping_points = result.data.dropping_points || {};
+        
                     this.buildMatrix();   
                 } else {  
                     console.error("Error booking ticket:", result);  
@@ -792,6 +815,7 @@
                 this.isLoading = false;  
             }  
         },
+
         buildMatrix() {
         if (!this.data || !Array.isArray(this.data.busSeats) || this.data.busSeats.length === 0) {
             console.error("busSeats is undefined, not an array, or empty");
@@ -905,18 +929,35 @@
     },
 
     async proceedToBooking() {
+        if (!this.selectedDeparture) {
+            alert("Please select a departure point.");
+            return; 
+        }
+
+        if (!this.selectedDestination) {
+            alert("Please select a destination point.");
+            return; 
+        }
+
+        if (this.selectedSeatIds.length === 0) {
+            alert("Please select at least one seat to proceed.");
+            return;
+        }
+
         this.seatisLoading = true;
         const payload = {
             booking_id: this.selectedBookingIds,
             seat_id: this.selectedSeatIds,
         };
-        
+
         try {
             const { data } = await axios.post("https://aboodbus.co.tz/passenger/hold-seats", payload, {
                 headers: { "Content-Type": "application/json" },
             });
-            
+
             console.log("Server response:", data);
+
+          
             this.$router.push({
                 name: "BookingDetails",
                 query: {
@@ -924,6 +965,8 @@
                     schedule_id: this.selectedScheduleIds[0] || "",
                     booking_id: this.selectedBookingIds.join(","),
                     seat_id: this.selectedSeatIds.join(","),
+                    departure: this.selectedDeparture,
+                    destination: this.selectedDestination,
                 },
             });
         } catch (error) {
@@ -933,13 +976,59 @@
             this.seatisLoading = false;
         }
     },
+    // Handle selection of departure city
+    handleDepartureSelection() {
+        this.selectedDeparture = this.selectedDeparture || null;  
+        // this.checkButtonEnable(); 
+    },
+    handleDestinationSelection() {
+        this.selectedDestination = this.selectedDestination || null;  
+        // this.checkButtonEnable(); 
+    },
+
+    // checkButtonEnable() {
+    //     if (this.selectedDeparture && this.selectedDestination) {
+    //         this.showProceedButton = true;
+    //     } else {
+    //         this.showProceedButton = false;
+    //     }
+    // },
     },
   };
   </script>
 <style scoped>
 .nav-tabs .nav-link {
-  cursor: pointer;
+    cursor: pointer;
+    color: black; 
+    font-weight: bold;
+    padding: 10px 35px;
 }
+
+.active-tab {
+    background-color: #28ABE2 !important; 
+    color: black !important;
+}
+
+.inactive-tab {
+    background-color: white !important;
+    color: black !important; 
+}
+
+.city-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px!important; 
+}
+
+.city-item {
+    display: flex;
+    align-items: center;
+    gap: 5px!important;
+    padding: 5px;
+    background-color: #f8f9fa; 
+    border-radius: 5px; 
+}
+
 .st0 {
 fill: #3276c3;
 }

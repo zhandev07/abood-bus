@@ -96,6 +96,13 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'SeatDetails',
+  // beforeRouteEnter(to, from, next) {
+  //   if (from.name === 'BookingDetails') {
+  //     next(false);  
+  //   } else {
+  //     next(); 
+  //   }
+  // },
   data() {
     return {
       paymentSuccess: false, 

@@ -50,7 +50,7 @@
                     <div class="col-lg-4"><div class="ticket-info"> Nauli:{{ ticket.payfare }} Tsh</div></div>
                   </div>
                   <br>
-                  <div class="row">
+                  <!-- <div class="row">
                     <div class="col-lg-6">
                       <label class="form-label">Kupandia <span class="text-danger">*</span></label>
                       <multiselect v-model="ticket.boardPointId" :options="boardPoints" label="name" track-by="id" placeholder="Chagua sehemu ya kupandia" class="form-control" required />
@@ -59,7 +59,7 @@
                       <label class="form-label">Kushukia <span class="text-danger">*</span></label>
                       <multiselect v-model="ticket.dropPointId" :options="dropPoints" label="name" track-by="id" placeholder="Chagua sehemu ya kushukia" class="form-control" required />
                     </div>
-                  </div>
+                  </div> -->
 
                   <div class="row">
                     <div class="col-lg-6">
@@ -103,26 +103,57 @@
           </div> 
           <!-- button  Details -->
           <div class="col-md-4">
-            <div class="col-md-12 py-3 price-details d-flex flex-column flex-md-row justify-content-between gap-2 text-center">
-              <button
-                class="btn btn-success flex-fill"
-                type="submit"
-                @click="submitForm"
-                :disabled="isLoading"  
-                style="font-weight: bold;"
-              >
-                <span v-if="isLoading">Loading...</span>
-                <span v-else>ENDELEA</span> 
-              </button>
-              <button
-                class="btn btn-danger flex-fill"
-                type="button"
-                @click="cancelForm"
-                style="font-weight: bold;"
-              >
-                GHAIRI
-              </button>
+            <div class="col-md-12 py-3 price-details d-flex flex-column flex-md-row justify-content-between gap-2">
+            <div class="col-md-12 py-3 price-container">
+              <h5 class="title text-center">Maelezo ya Bei</h5>
+              <table class="table">
+                <tbody>
+                  <!-- Display fares per seat -->
+                  <tr v-for="seat in seatFares" :key="seat.seatNumber">
+                    <td>Seat #{{ seat.seatNumber }}</td>
+                    <td>TSH. {{ seat.fare.toFixed(2) }}</td>
+                  </tr>
+
+                  <!-- Bus number -->
+                  <tr>
+                    <td>Bus</td>
+                    <td>{{ bus_number }}</td>
+                  </tr>
+
+                  <!-- Total payable amount -->
+                  <tr>
+                    <td><strong>Kiasi cha Kulipwa</strong></td>
+                    <td><strong>TSH. {{ payableAmount.toFixed(2) }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- Button Container -->
+              <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mt-3">
+                <!-- "ENDELEA" button -->
+                <button
+                  class="btn btn-success btn-lg flex-fill mb-2 mb-md-0"
+                  type="submit"
+                  @click="submitForm"
+                  :disabled="isLoading"
+                  style="font-weight: bold;"
+                >
+                  <span v-if="isLoading">Loading...</span>
+                  <span v-else>ENDELEA</span>
+                </button>
+
+                <!-- "GHAIRI" button -->
+                <button
+                  class="btn btn-danger btn-lg flex-fill"
+                  type="button"
+                  @click="cancelForm"
+                  style="font-weight: bold;"
+                >
+                  GHAIRI
+                </button>
+              </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -159,6 +190,8 @@
         termsAccepted: false,
         busId: this.$route.query.bus_id || '',
         scheduleId: this.$route.query.schedule_id || '',
+        departure: this.$route.query.departure || "", 
+        destination: this.$route.query.destination || "", 
         selectedSeatsData: {
           seat_id: this.$route.query.seat_id ? this.$route.query.seat_id.split(',') : [],
           booking_id: this.$route.query.booking_id ? this.$route.query.booking_id.split(',') : [],
@@ -174,33 +207,38 @@
           ages: [],
           genders: []
         },
-        seatDetailsLoading: false,
+        totalExclTax: 0, 
+        payableAmount: 0, 
       };
     },
     watch: {
       $route(to) {
-        console.log('Route changed:', to.query);  
+        console.log("Route changed:", to.query);
         this.busId = to.query.bus_id;
         this.scheduleId = to.query.schedule_id;
+        this.departure = to.query.departure;
+        this.destination = to.query.destination;
         this.selectedSeatsData = {
-          seat_id: to.query.seat_id ? to.query.seat_id.split(',') : [],
-          booking_id: to.query.booking_id ? to.query.booking_id.split(',') : [],
+          seat_id: to.query.seat_id ? to.query.seat_id.split(",") : [],
+          booking_id: to.query.booking_id ? to.query.booking_id.split(",") : [],
         };
-        this.fetchBookingDetails(); 
+        this.fetchBookingDetails();
       },
     },
 
     created() {
       console.log('Bus ID:', this.busId);
       console.log('Schedule ID:', this.scheduleId);
+      console.log("Departure:", this.departure);
+      console.log("Destination:", this.destination);
 
       if (!this.busId || !this.scheduleId || this.selectedSeatsData.seat_id.length === 0) {
-        this.$router.push({ name: 'Home' });  
-        return;
-      }
+      this.$router.push({ name: "Home" });
+      return;
+    }
 
-      this.fetchBookingDetails();
-    },
+    this.fetchBookingDetails();
+  },
 
     methods: {
       async fetchBookingDetails() {
@@ -260,6 +298,7 @@
             seatNumber: seat.name, 
             journeyDate: result.data.bus_schedule.departure_date || '',
             departureTime: result.data.bus_schedule.departure_time || '',
+            bus_number: result.data.bus_schedule.bus || '',
             payfare: result.data.fare || '',
             boardPointId: null,
             dropPointId: null,
@@ -269,6 +308,15 @@
             phoneNumber: '',
             bookingId: seat.bookingId
           }));
+          // Store seat-wise fares
+          this.seatFares = selectedSeats.map(seat => ({
+            seatNumber: seat.name,
+            fare: this.fare, // Assume same fare for each seat
+          }));
+
+          // Update total payable amount
+          this.totalExclTax = this.seatFares.reduce((total, seat) => total + seat.fare, 0);
+          this.payableAmount = this.totalExclTax; 
         } else {
           console.error("Failed to fetch data:", result.message);
           this.errorMessage = result.message || "Error fetching booking details.";
@@ -281,27 +329,32 @@
       }
     },
     async submitForm() {
-      if (!this.mobilePaymentNumber || !this.scheduleId || this.tickets.some(ticket =>
-        !ticket.phoneNumber || 
-        !ticket.bookingId || 
-        !ticket.boardPointId || 
-        !ticket.dropPointId || 
-        !ticket.age || 
-        !ticket.fullName || 
-        !ticket.gender)) {
+      if (
+        !this.mobilePaymentNumber ||
+        !this.scheduleId ||
+        !this.departure ||
+        !this.destination ||
+        this.tickets.some(
+          (ticket) =>
+            !ticket.phoneNumber ||
+            !ticket.bookingId ||
+            !ticket.age ||
+            !ticket.fullName ||
+            !ticket.gender
+        )
+      ) {
         alert("Please fill in all required fields.");
         return;
       }
 
-      // Prepare payload
       const payload = {
         payment_mobile_number: this.mobilePaymentNumber,
         schedule_id: this.scheduleId,
-        bookings: this.tickets.map(ticket => ({
+        bookings: this.tickets.map((ticket) => ({
           passenger_phone_number: ticket.phoneNumber,
           booking_id: ticket.bookingId,
-          board_point_id: ticket.boardPointId?.id, 
-          dropping_point_id: ticket.dropPointId?.id,
+          board_point_id: this.departure, 
+          dropping_point_id: this.destination, 
           age_id: ticket.age?.id,
           full_name: ticket.fullName,
           gender_id: ticket.gender?.id,
@@ -312,9 +365,12 @@
 
       try {
         const response = await axios.post(
-          "https://aboodbus.co.tz/passenger/booking/seats-details", 
-          payload, 
-          { headers: { "Content-Type": "application/json" } }
+          "https://aboodbus.co.tz/passenger/booking/seats-details",
+          payload,
+          { 
+            headers: { "Content-Type": "application/json" },
+            timeout: 10000, // 10 seconds timeout to avoid hanging requests
+          }
         );
 
         if (response.data.code === 200) {
@@ -325,11 +381,17 @@
         }
       } catch (error) {
         console.error("Booking submission error:", error);
-        alert(error.response?.data?.message || "An error occurred while submitting the booking.");
+
+        if (error.code === "ERR_NETWORK") {
+          alert("Network error! Please check your internet connection and try again.");
+        } else {
+          alert(error.response?.data?.message || "An error occurred while submitting the booking.");
+        }
       } finally {
         this.seatDetailsLoading = false;
       }
     },
+
     },
   };
 
