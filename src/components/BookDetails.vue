@@ -138,7 +138,7 @@
                   :disabled="isLoading"
                   style="font-weight: bold;"
                 >
-                  <span v-if="isLoading">Loading...</span>
+                  <span v-if="isLoadingbutton">Loading...</span>
                   <span v-else>ENDELEA</span>
                 </button>
 
@@ -209,6 +209,7 @@
         },
         totalExclTax: 0, 
         payableAmount: 0, 
+        isLoadingbutton: false,
       };
     },
     watch: {
@@ -361,7 +362,7 @@
         })),
       };
 
-      this.seatDetailsLoading = true;
+      this.isLoadingbutton = true;
 
       try {
         const response = await axios.post(
@@ -388,7 +389,7 @@
           alert(error.response?.data?.message || "An error occurred while submitting the booking.");
         }
       } finally {
-        this.seatDetailsLoading = false;
+        this.isLoadingbutton = false;
       }
     },
 
