@@ -771,7 +771,7 @@
         },
         async bookTicket(bus) {
             if (this.selectedBus && this.selectedBus.bus_id === bus.bus_id) {
-                console.log("You have already initiated booking for this bus.");
+                // console.log("You have already initiated booking for this bus.");
                 return; 
             } else {
                 this.selectedBus = bus;
@@ -785,7 +785,7 @@
                 this.selectedSeatIds = [];
             }
 
-            console.log("Booking ticket for Bus:", bus);  
+            // console.log("Booking ticket for Bus:", bus);  
             this.isLoading = true;  
             this.errorMessage = "";  
 
@@ -795,7 +795,7 @@
             };  
 
             try {  
-                console.log("Sending request to API with payload:", requestBody);  
+                // console.log("Sending request to API with payload:", requestBody);  
                 const response = await fetch("https://aboodbus.co.tz/passenger/bus-chart", {  
                     method: "POST",  
                     headers: { "Content-Type": "application/json" },  
@@ -803,10 +803,10 @@
                 });  
 
                 const result = await response.json();  
-                console.log("API Response:", result);  
+                // console.log("API Response:", result);  
 
                 if (response.ok) {  
-                    console.log("Seat Data Retrieved Successfully:", result.data);  
+                    // console.log("Seat Data Retrieved Successfully:", result.data);  
                     this.data.busSeats = result.data.bus_seats;  
                     this.data.bus_schedule = result.data.bus_schedule || {};  
                     this.seatsLimit = result.data.seats_limit || 0;  
@@ -900,7 +900,7 @@
                 return seatMap.get(row).get(colIndex) ?? null; // Use null for missing seats
             }).filter(item => item !== undefined));
 
-        console.log(this.data.seatMatrix);
+        // console.log(this.data.seatMatrix);
     },
         toggleSeatSelection(seat) {
         if (seat.disabled) return;
@@ -939,53 +939,59 @@
     },
 
     async proceedToBooking() {
-        if (!this.selectedDeparture) {
-            alert("Please select a departure point.");
-            return; 
-        }
+    // Check if the departure point is selected
+    if (!this.selectedDeparture) {
+        alert("Please select a departure point.");
+        return; 
+    }
 
-        if (!this.selectedDestination) {
-            alert("Please select a destination point.");
-            return; 
-        }
+    // Check if the destination point is selected
+    if (!this.selectedDestination) {
+        alert("Please select a destination point.");
+        return; 
+    }
 
-        if (this.selectedSeatIds.length === 0) {
-            alert("Please select at least one seat to proceed.");
-            return;
-        }
+    // Check if at least one seat is selected
+    if (this.selectedSeatIds.length === 0) {
+        alert("Please select at least one seat to proceed.");
+        return;
+    }
 
-        this.seatisLoading = true;
-        const payload = {
-            booking_id: this.selectedBookingIds,
-            seat_id: this.selectedSeatIds,
-        };
+    // Set loading state
+    this.seatisLoading = true;
 
-        try {
-            const { data } = await axios.post("https://aboodbus.co.tz/passenger/hold-seats", payload, {
-                headers: { "Content-Type": "application/json" },
-            });
+    // Prepare the payload for the API request
+    const payload = {
+        booking_id: this.selectedBookingIds,
+        seat_id: this.selectedSeatIds,
+    };
 
-            console.log("Server response:", data);
+    try {
+        // Make the API request to hold the seats
+        await axios.post("https://aboodbus.co.tz/passenger/hold-seats", payload, {
+            headers: { "Content-Type": "application/json" },
+        });
 
-          
-            this.$router.push({
-                name: "BookingDetails",
-                query: {
-                    bus_id: this.selectedBusIds[0] || "",
-                    schedule_id: this.selectedScheduleIds[0] || "",
-                    booking_id: this.selectedBookingIds.join(","),
-                    seat_id: this.selectedSeatIds.join(","),
-                    departure: this.selectedDeparture,
-                    destination: this.selectedDestination,
-                },
-            });
-        } catch (error) {
-            console.error("Error holding seats:", error.response?.data || error.message);
-            alert(error.response?.data?.message || "Failed to hold seats. Please try again.");
-        } finally {
-            this.seatisLoading = false;
-        }
-    },
+        // Navigate to the booking details page with relevant query parameters
+        this.$router.push({
+            name: "BookingDetails",
+            query: {
+                bus_id: this.selectedBusIds[0] || "",
+                schedule_id: this.selectedScheduleIds[0] || "",
+                booking_id: this.selectedBookingIds.join(","),
+                seat_id: this.selectedSeatIds.join(","),
+                departure: this.selectedDeparture,
+                destination: this.selectedDestination,
+            },
+        });
+    } catch (error) {
+        // Log the error message in case of failure
+        alert(error.response?.data?.message || "Failed to hold seats. Please try again.");
+    } finally {
+        // Reset loading state
+        this.seatisLoading = false;
+    }
+},
     // Handle selection of departure city
     handleDepartureSelection() {
         this.selectedDeparture = this.selectedDeparture || null;  

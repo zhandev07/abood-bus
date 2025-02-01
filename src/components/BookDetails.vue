@@ -146,10 +146,12 @@
                 <button
                   class="btn btn-danger btn-lg flex-fill"
                   type="button"
-                  @click="cancelForm"
+                  @click="ghairiForm"
+                  :disabled="isLoadingGhairi"
                   style="font-weight: bold;"
                 >
-                  GHAIRI
+                  <span v-if="isLoadingGhairi">Loading...</span>
+                  <span v-else>GHAIRI</span>
                 </button>
               </div>
             </div>
@@ -181,6 +183,9 @@
     name: "BookingDetails",
     data() {
       return {
+        seatFares: 0,
+         bus_number: '',
+         seatDetailsLoading: false,
         boardPoints: [],
         dropPoints: [],
         genderOptions: [],
@@ -210,11 +215,12 @@
         totalExclTax: 0, 
         payableAmount: 0, 
         isLoadingbutton: false,
+        isLoadingGhairi: false,
       };
     },
     watch: {
       $route(to) {
-        console.log("Route changed:", to.query);
+        // console.log("Route changed:", to.query);
         this.busId = to.query.bus_id;
         this.scheduleId = to.query.schedule_id;
         this.departure = to.query.departure;
@@ -228,10 +234,10 @@
     },
 
     created() {
-      console.log('Bus ID:', this.busId);
-      console.log('Schedule ID:', this.scheduleId);
-      console.log("Departure:", this.departure);
-      console.log("Destination:", this.destination);
+      // console.log('Bus ID:', this.busId);
+      // console.log('Schedule ID:', this.scheduleId);
+      // console.log("Departure:", this.departure);
+      // console.log("Destination:", this.destination);
 
       if (!this.busId || !this.scheduleId || this.selectedSeatsData.seat_id.length === 0) {
       this.$router.push({ name: "Home" });
@@ -262,7 +268,7 @@
 
         const result = response.data;
         if (result.code === 200 && result.data) {
-          console.log("Booking details:", result.data);
+          // console.log("Booking details:", result.data);
           
           this.data.busSeats = result.data.bus_seats || [];
           this.data.bus_schedule = result.data.bus_schedule || {};
@@ -392,7 +398,52 @@
         this.isLoadingbutton = false;
       }
     },
+    async ghairiForm() {
+  this.isLoadingGhairi = true;
 
+  // Extract booking IDs and convert to a plain array
+  const plainData = JSON.parse(JSON.stringify(this.selectedSeatsData));
+  const bookingIds = plainData.booking_id;
+
+  // console.log("Selected booking IDs:", bookingIds);
+
+  if (bookingIds.length === 0) {
+    alert("No bookings selected.");
+    this.isLoadingGhairi = false;
+    return;
+  }
+
+  const payload = {
+    booking_ids: bookingIds,
+  };
+
+  // console.log("Payload for releasing seats:", payload);
+
+  try {
+    const response = await axios.post(
+      "https://aboodbus.co.tz/api/agents/release-seats",
+      payload,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    // console.log("Response from release-seats API:", response);
+
+    // Check if the HTTP status code is 200 (OK)
+    if (response.status === 200) {
+      // alert("Seats released successfully.");
+      this.$router.push({ name: "Home" });
+    } else {
+      alert("Error releasing seats. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error releasing seats:", error);
+    alert(error.response?.data?.message || "An error occurred.");
+  } finally {
+    this.isLoadingGhairi = false;
+  }
+},
     },
   };
 
