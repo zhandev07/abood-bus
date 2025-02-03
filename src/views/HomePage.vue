@@ -1,18 +1,18 @@
 <template>
     <div>
       <HeroSection />
-      <AboutUsSection />
-      <RoutesSection />
-      <OtherservicesSection />
+      <AboutUsSection v-if="isDesktop"/>
+      <RoutesSection v-if="isDesktop"/>
+      <OtherservicesSection v-if="isDesktop"/>
     </div>
   </template>
   
   <script>
-  import HeroSection from "@/components/sections/HeroSection.vue"; 
+  import HeroSection from "@/components/sections/HeroSection.vue";
   import AboutUsSection from "@/components/sections/AboutUsSection.vue";
-  import RoutesSection from "@/components/sections/RoutesSection.vue"; 
-  import OtherservicesSection from "@/components/sections/OtherservicesSection.vue"; 
-
+  import RoutesSection from "@/components/sections/RoutesSection.vue";
+  import OtherservicesSection from "@/components/sections/OtherservicesSection.vue";
+  
   export default {
     name: "HomePage",
     components: {
@@ -21,8 +21,26 @@
       RoutesSection,
       OtherservicesSection,
     },
+    data() {
+      return {
+        isDesktop: true
+      };
+    },
+    mounted() {
+      this.checkScreenSize();
+      window.addEventListener("resize", this.checkScreenSize);
+    },
+    beforeUnmount() {
+      window.removeEventListener("resize", this.checkScreenSize);
+    },
+    methods: {
+      checkScreenSize() {
+        this.isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      }
+    }
   };
   </script>
+  
   
 
   

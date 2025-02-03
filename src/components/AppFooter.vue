@@ -11,7 +11,7 @@
   
             <div class="col-lg-3 col-md-6 footer-contact">
               <h4>Our Address</h4>
-              <div class="contact-info">
+              <div class="contact-info-1">
                 <div>
                   <p class="text-uppercase">Abood Bus Service Limited</p>
                   <p>P.O.Box 127 Morogoro, Tanzania</p>

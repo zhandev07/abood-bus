@@ -2,7 +2,41 @@
   <section id="team_old" class="booking-details card-text" style="padding: 20px;">
     <div class="container">
       <div class="col-md-12">
-        <div class="row z-depth-1">
+        <div v-if="isLoading" class="row z-depth-1">
+          <!-- Left Section -->
+          <div class="col-md-8">
+            <!-- Passenger Details Skeleton -->
+            <div class="col-md-12 mt-3 pt-3 passenger-details">
+              <div class="skeleton-loader ticket-card">
+                <span class="skeleton skeleton-text skeleton-title"></span>
+                <div class="row">
+                  <div class="col-lg-4"><div class="skeleton skeleton-text"></div></div>
+                  <div class="col-lg-4 text-center"><div class="skeleton skeleton-text"></div></div>
+                  <div class="col-lg-4"><div class="skeleton skeleton-text"></div></div>
+                </div>
+                <br>
+                <div class="row">
+                  <div class="col-lg-6"><div class="skeleton skeleton-input"></div></div>
+                  <div class="col-lg-6"><div class="skeleton skeleton-input"></div></div>
+                </div>
+                <div class="skeleton skeleton-input"></div>
+                <div class="skeleton skeleton-input"></div>
+              </div>
+              <div class="skeleton-loader skeleton-input"></div>
+              <div class="skeleton-loader skeleton-checkbox"></div>
+            </div>
+          </div>
+          <!-- Right Section Skeleton -->
+          <div class="col-md-4">
+            <div class="col-md-12 py-3 price-details">
+              <div class="skeleton skeleton-text skeleton-title"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-button"></div>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="row z-depth-1">
           <!-- Left Section -->
           <div class="col-md-8">
             <!-- <div class="col-md-12 journey-details">
@@ -161,9 +195,9 @@
       </div>
     </div>
     <!-- Loading Overlay -->
-    <div v-if="isLoading" class="loading">
+    <!-- <div v-if="isLoading" class="loading">
       <div class="loading-spinner"></div>
-    </div>
+    </div> -->
   </section>
   <div v-show="seatDetailsLoading" class="loading">
     <div class="loading-spinner"></div>
@@ -216,6 +250,7 @@
         payableAmount: 0, 
         isLoadingbutton: false,
         isLoadingGhairi: false,
+        isLoading: false,
       };
     },
     watch: {
@@ -376,7 +411,6 @@
           payload,
           { 
             headers: { "Content-Type": "application/json" },
-            timeout: 10000, 
           }
         );
 
@@ -550,6 +584,42 @@ transform: rotate(0deg);
 transform: rotate(360deg);
 }
 }
+
+
+
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 4px;
+  }
+  .skeleton-text {
+    height: 16px;
+    margin-bottom: 8px;
+  }
+  .skeleton-title {
+    width: 60%;
+    height: 20px;
+  }
+  .skeleton-input {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  .skeleton-button {
+    width: 100%;
+    height: 50px;
+  }
+  .skeleton-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 
 </style>
   

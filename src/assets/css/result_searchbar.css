@@ -11,7 +11,9 @@
     background-color: #ffffff;
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #cff0ff!important;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    margin: auto;
     width: 100%;
     /* max-width: 800px; */
 }
@@ -58,7 +60,7 @@
 .search-button {
     height: 50px;
     font-size: 16px;
-    background-color: #ff3d3d;
+    background-color: #96000c;;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -68,7 +70,7 @@
 }
 
 .search-button:hover {
-    background-color: #ff3d3d;
+    background-color: #96000c;
 }
 
 /* Dropdown styling */

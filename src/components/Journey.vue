@@ -41,24 +41,39 @@
                                     </div>
 
                                     <!-- Destination Input -->
-                                    <div class="input-wrapper">
-                                        <input
-                                            type="text"
-                                            v-model="destination"
-                                            class="input-field"
-                                            placeholder="Search or Select City"
-                                            @input="filterDestinationOptions"
-                                            @focus="filterDestinationOptions"
-                                        />
-                                        <ul v-if="showDestinationDropdown" class="custom-dropdown">
-                                            <li v-for="(option, index) in filteredDestinationOptions"
-                                                :key="index"
-                                                class="dropdown-item"
-                                                @click="selectDestination(option)">
-                                                {{ option.city }}
-                                            </li>
-                                        </ul>
-                                    </div>
+<div class="input-wrapper">
+    <div class="input-container">
+        <input
+            type="text"
+            v-model="destination"
+            class="input-field"
+            placeholder="Search or Select City"
+            @input="filterDestinationOptions"
+            @focus="filterDestinationOptions"
+        />
+        <!-- Loading Spinner -->
+        <div v-if="isLoadingDestination" class="loading-spinner-two">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" style="width: 24px; height: 24px;">
+                <!-- Outer circle (gray border) -->
+                <circle cx="25" cy="25" r="20" stroke="gray" stroke-width="5" fill="none"/>
+                
+                <!-- Inner spinning circle (changed to red) -->
+                <circle cx="25" cy="25" r="20" stroke="#96000c" stroke-width="5" fill="none" stroke-dasharray="126.92" stroke-dashoffset="126.92">
+                    <animate attributeName="stroke-dashoffset" values="126.92;0" dur="1s" keyTimes="0;1" repeatCount="indefinite" />
+                </circle>
+            </svg>
+        </div>
+    </div>
+    <ul v-if="showDestinationDropdown" class="custom-dropdown">
+        <li v-for="(option, index) in filteredDestinationOptions"
+            :key="index"
+            class="dropdown-item"
+            @click="selectDestination(option)">
+            {{ option.city }}
+        </li>
+    </ul>
+</div>
+
 
                                     <!-- Date Input -->
                                     <div class="input-wrapper">
@@ -83,13 +98,9 @@
             </div>
             </div>
         </div>
-        <div v-if="isLoading" class="bus-loading-overlay">
-            <div class="bus-loading-card">
-                <div class="bus-loading"></div>
-                <p>Loading...</p>
-            </div>
+        <div v-if="isLoading" class="loading-overlay">
+            <div class="loading-spinner"></div>
         </div>
-
       <section id="bus-selection" class="bus-selection">
             <div v-if="errorMessage" class="alert alert-warning text-center">
                 {{ errorMessage }}
@@ -611,6 +622,7 @@
         activeTab: 'departure', 
         selectedDeparture: null,
         selectedDestination: null, 
+        isLoadingDestination: false,
       };
     },
     computed: {
@@ -672,16 +684,18 @@
         }
         },
         async fetchDestinationCities(departureId) {
+            this.isLoadingDestination = true;
             try {
                 const response = await fetch(`https://aboodbus.co.tz/passenger/${departureId}/dropping-cities`);
                 const data = await response.json();
                 this.destinationOptions = data.data.cities || [];
                 this.filteredDestinationOptions = [...this.destinationOptions];
 
-                // Pre-fill the destination city
                 this.fillCityNames();
             } catch (error) {
                 console.error("Error fetching destination cities:", error);
+            }  finally {
+            this.isLoadingDestination = false;  
             }
         },
       filterDepartureOptions() {
@@ -1083,51 +1097,66 @@ color: #333;
 .toggle-icon {
 color: #3498db; 
 }
-.bus-loading-overlay {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.7);
-    z-index: 9999;
+/* Overlay covering the entire viewport */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-/* Small Loading Card */
-.bus-loading-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 120px;
-    height: 120px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    text-align: center;
+/* The loading spinner container */
+.loading-spinner {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.8); /* light, translucent background for contrast */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Loading Spinner */
-.bus-loading {
-    width: 50px;
-    height: 50px;
-    border: 4px solid transparent;
-    border-radius: 50%;
-    border-top: 4px solid #3498db;
-    border-bottom: 4px solid #CB252B;
-    animation: spin 1.5s linear infinite;
+/* Pseudo-elements for the spinner rings */
+.loading-spinner::before,
+.loading-spinner::after {
+  content: '';
+  position: absolute;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
 }
 
-/* Loading Animation */
+/* Outer ring using your primary color */
+.loading-spinner::before {
+  width: 100%;
+  height: 100%;
+  border-top-color: #3498db; /* primary blue */
+}
+
+/* Inner ring using your secondary color */
+.loading-spinner::after {
+  width: 70%;
+  height: 70%;
+  top: 15%;
+  left: 15%;
+  border-bottom-color: #CB252B; /* secondary red */
+  animation-duration: 1s;
+}
+
+/* Keyframes for rotation */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
-
 
 
 @keyframes slideInFade {
@@ -1295,4 +1324,31 @@ margin-top: 4px;
     margin-top: 10px!important;
     border-top: 1px solid #29abe2;
 }
+.input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-field {
+  width: 100%;
+  padding-right: 35px; /* Space for the spinner */
+}
+
+.loading-spinner-two {
+  position: absolute;
+  top: 50%;
+  right: 10px; /* Adjust position inside input */
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+}
+
+
 </style>
