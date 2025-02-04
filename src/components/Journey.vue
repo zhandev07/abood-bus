@@ -99,7 +99,10 @@
             </div>
         </div>
         <div v-if="isLoading" class="loading-overlay">
-            <div class="loading-spinner"></div>
+            <div class="loading-card">
+                <img src="@/assets/images/Aboodloader.gif" alt="Loading..." class="loading-gif" />
+                <!-- <p class="loading-text">Loading, please wait...</p> -->
+            </div>
         </div>
       <section id="bus-selection" class="bus-selection">
             <div v-if="errorMessage" class="alert alert-warning text-center">
@@ -1131,63 +1134,40 @@ color: #3498db;
 }
 /* Overlay covering the entire viewport */
 .loading-overlay {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: rgba(0, 0, 0, 0.5); /* semi-transparent dark background */
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-/* The loading spinner container */
-.loading-spinner {
-position: relative;
-width: 70px;
-height: 70px;
-background: rgba(255, 255, 255, 0.8); /* light, translucent background for contrast */
-border-radius: 10px;
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+/* Centered Card */
+.loading-card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 300px;
+  /* height: 200px; */
 }
 
-/* Pseudo-elements for the spinner rings */
-.loading-spinner::before,
-.loading-spinner::after {
-content: '';
-position: absolute;
-border: 4px solid transparent;
-border-radius: 50%;
-animation: spin 1.5s linear infinite;
+/* GIF Loader Styling */
+.loading-gif {
+  width: 100px; /* Adjust size as needed */
+  height: auto;
+  /* margin-bottom: 10px; */
 }
 
-/* Outer ring using your primary color */
-.loading-spinner::before {
-width: 100%;
-height: 100%;
-border-top-color: #3498db; /* primary blue */
-}
-
-/* Inner ring using your secondary color */
-.loading-spinner::after {
-width: 70%;
-height: 70%;
-top: 15%;
-left: 15%;
-border-bottom-color: #CB252B; /* secondary red */
-animation-duration: 1s;
-}
-
-/* Keyframes for rotation */
-@keyframes spin {
-0% {
-transform: rotate(0deg);
-}
-100% {
-transform: rotate(360deg);
-}
+/* Loading Text */
+.loading-text {
+  font-size: 16px;
+  color: #333;
 }
 
 
