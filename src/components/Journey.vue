@@ -41,38 +41,38 @@
                                     </div>
 
                                     <!-- Destination Input -->
-<div class="input-wrapper">
-    <div class="input-container">
-        <input
-            type="text"
-            v-model="destination"
-            class="input-field"
-            placeholder="Search or Select City"
-            @input="filterDestinationOptions"
-            @focus="filterDestinationOptions"
-        />
-        <!-- Loading Spinner -->
-        <div v-if="isLoadingDestination" class="loading-spinner-two">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" style="width: 24px; height: 24px;">
-                <!-- Outer circle (gray border) -->
-                <circle cx="25" cy="25" r="20" stroke="gray" stroke-width="5" fill="none"/>
-                
-                <!-- Inner spinning circle (changed to red) -->
-                <circle cx="25" cy="25" r="20" stroke="#96000c" stroke-width="5" fill="none" stroke-dasharray="126.92" stroke-dashoffset="126.92">
-                    <animate attributeName="stroke-dashoffset" values="126.92;0" dur="1s" keyTimes="0;1" repeatCount="indefinite" />
-                </circle>
-            </svg>
-        </div>
-    </div>
-    <ul v-if="showDestinationDropdown" class="custom-dropdown">
-        <li v-for="(option, index) in filteredDestinationOptions"
-            :key="index"
-            class="dropdown-item"
-            @click="selectDestination(option)">
-            {{ option.city }}
-        </li>
-    </ul>
-</div>
+                                    <div class="input-wrapper">
+                                        <div class="input-container">
+                                            <input
+                                                type="text"
+                                                v-model="destination"
+                                                class="input-field"
+                                                placeholder="Search or Select City"
+                                                @input="filterDestinationOptions"
+                                                @focus="filterDestinationOptions"
+                                            />
+                                            <!-- Loading Spinner -->
+                                            <div v-if="isLoadingDestination" class="loading-spinner-two">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" style="width: 24px; height: 24px;">
+                                                    <!-- Outer circle (gray border) -->
+                                                    <circle cx="25" cy="25" r="20" stroke="gray" stroke-width="5" fill="none"/>
+                                                    
+                                                    <!-- Inner spinning circle (changed to red) -->
+                                                    <circle cx="25" cy="25" r="20" stroke="#96000c" stroke-width="5" fill="none" stroke-dasharray="126.92" stroke-dashoffset="126.92">
+                                                        <animate attributeName="stroke-dashoffset" values="126.92;0" dur="1s" keyTimes="0;1" repeatCount="indefinite" />
+                                                    </circle>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <ul v-if="showDestinationDropdown" class="custom-dropdown">
+                                            <li v-for="(option, index) in filteredDestinationOptions"
+                                                :key="index"
+                                                class="dropdown-item"
+                                                @click="selectDestination(option)">
+                                                {{ option.city }}
+                                            </li>
+                                        </ul>
+                                    </div>
 
 
                                     <!-- Date Input -->
@@ -284,7 +284,47 @@
                             </div>
                         </div>
 
-                        <div v-if="selectedBus && selectedBus.bus_id === bus.bus_id" class="row seat-map-container">
+                        <div v-if="selectedBus && selectedBus.bus_id === bus.bus_id">
+                            <!-- When skeleton is active (loading state) -->
+                            <div v-if="isSkeletonLoading" class="row seat-map-container">
+                                <!-- Left Section: Seat Map Skeleton -->
+                                <div class="col-12 col-md-6 mt-2">
+                                <div class="skeleton skeleton-seat-map mx-md-3 p-3 border rounded shadow-sm bg-white">
+                                    <!-- Icon/Text Row Skeleton -->
+                                    <div class="skeleton-row">
+                                    <!-- Skeleton for first icon and text -->
+                                    <div class="skeleton skeleton-icon"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <!-- Skeleton for second icon and text -->
+                                    <div class="skeleton skeleton-icon"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    <!-- Skeleton for third icon and text -->
+                                    <div class="skeleton skeleton-icon"></div>
+                                    <div class="skeleton skeleton-text"></div>
+                                    </div>
+                                    <!-- Skeleton for the Seat Map Form -->
+                                    <div class="skeleton skeleton-form"></div>
+                                </div>
+                                </div>
+
+                                <!-- Right Section: Bus Info Skeleton -->
+                                <div class="col-12 col-md-6 mt-2">
+                                <div class="skeleton skeleton-bus-info p-3 border rounded shadow-sm bg-light">
+                                    <!-- Skeleton for the Tabs -->
+                                    <div class="skeleton skeleton-tabs">
+                                    <div class="skeleton skeleton-tab"></div>
+                                    <div class="skeleton skeleton-tab"></div>
+                                    </div>
+                                    <!-- Skeleton for the Tab Content -->
+                                    <div class="skeleton skeleton-tab-content"></div>
+                                    <!-- Skeleton for the Proceed Button -->
+                                    <div class="skeleton skeleton-button"></div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <!-- Actual content once loading is complete -->
+                            <div v-else class="row seat-map-container">
                             <div class="col-12 col-md-6 mt-2">
                                 <div class="seat-map mx-md-3 p-3 border rounded shadow-sm bg-white">
           
@@ -561,6 +601,7 @@
                                 </div> 
                             </div>
                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -623,6 +664,7 @@
         selectedDeparture: null,
         selectedDestination: null, 
         isLoadingDestination: false,
+        isSkeletonLoading: false,
       };
     },
     computed: {
@@ -801,6 +843,7 @@
 
             // console.log("Booking ticket for Bus:", bus);  
             this.isLoading = true;  
+            this.isSkeletonLoading = true;
             this.errorMessage = "";  
 
             const requestBody = {  
@@ -837,6 +880,7 @@
                 this.errorMessage = "Something went wrong, please try again.";  
             } finally {  
                 this.isLoading = false;  
+                this.isSkeletonLoading= false;
             }  
         },
 
@@ -1028,35 +1072,35 @@
   </script>
 <style scoped>
 .nav-tabs .nav-link {
-    cursor: pointer;
-    color: black; 
-    font-weight: bold;
-    padding: 10px 35px;
+cursor: pointer;
+color: black; 
+font-weight: bold;
+padding: 10px 35px;
 }
 
 .active-tab {
-    background-color: #28ABE2 !important; 
-    color: black !important;
+background-color: #28ABE2 !important; 
+color: black !important;
 }
 
 .inactive-tab {
-    background-color: white !important;
-    color: black !important; 
+background-color: white !important;
+color: black !important; 
 }
 
 .city-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2px!important; 
+display: flex;
+flex-direction: column;
+gap: 2px!important; 
 }
 
 .city-item {
-    display: flex;
-    align-items: center;
-    gap: 5px!important;
-    padding: 5px;
-    background-color: #f8f9fa; 
-    border-radius: 5px; 
+display: flex;
+align-items: center;
+gap: 5px!important;
+padding: 5px;
+background-color: #f8f9fa; 
+border-radius: 5px; 
 }
 
 .st0 {
@@ -1099,63 +1143,63 @@ color: #3498db;
 }
 /* Overlay covering the entire viewport */
 .loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent dark background */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5); /* semi-transparent dark background */
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 9999;
 }
 
 /* The loading spinner container */
 .loading-spinner {
-  position: relative;
-  width: 70px;
-  height: 70px;
-  background: rgba(255, 255, 255, 0.8); /* light, translucent background for contrast */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+position: relative;
+width: 70px;
+height: 70px;
+background: rgba(255, 255, 255, 0.8); /* light, translucent background for contrast */
+border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Pseudo-elements for the spinner rings */
 .loading-spinner::before,
 .loading-spinner::after {
-  content: '';
-  position: absolute;
-  border: 4px solid transparent;
-  border-radius: 50%;
-  animation: spin 1.5s linear infinite;
+content: '';
+position: absolute;
+border: 4px solid transparent;
+border-radius: 50%;
+animation: spin 1.5s linear infinite;
 }
 
 /* Outer ring using your primary color */
 .loading-spinner::before {
-  width: 100%;
-  height: 100%;
-  border-top-color: #3498db; /* primary blue */
+width: 100%;
+height: 100%;
+border-top-color: #3498db; /* primary blue */
 }
 
 /* Inner ring using your secondary color */
 .loading-spinner::after {
-  width: 70%;
-  height: 70%;
-  top: 15%;
-  left: 15%;
-  border-bottom-color: #CB252B; /* secondary red */
-  animation-duration: 1s;
+width: 70%;
+height: 70%;
+top: 15%;
+left: 15%;
+border-bottom-color: #CB252B; /* secondary red */
+animation-duration: 1s;
 }
 
 /* Keyframes for rotation */
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+0% {
+transform: rotate(0deg);
+}
+100% {
+transform: rotate(360deg);
+}
 }
 
 
@@ -1321,34 +1365,139 @@ margin-top: 4px;
 /*background: rgba(212, 7, 70, .05);*/
 }
 .seat-map-container{
-    margin-top: 10px!important;
-    border-top: 1px solid #29abe2;
+margin-top: 10px!important;
+border-top: 1px solid #29abe2;
 }
 .input-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+position: relative;
+display: flex;
+flex-direction: column;
+width: 100%;
 }
 
 .input-container {
-  position: relative;
-  width: 100%;
+position: relative;
+width: 100%;
 }
 
 .input-field {
-  width: 100%;
-  padding-right: 35px; /* Space for the spinner */
+width: 100%;
+padding-right: 35px; /* Space for the spinner */
 }
 
 .loading-spinner-two {
-  position: absolute;
-  top: 50%;
-  right: 10px; /* Adjust position inside input */
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
+position: absolute;
+top: 50%;
+right: 10px; /* Adjust position inside input */
+transform: translateY(-50%);
+width: 24px;
+height: 24px;
 }
+ /* Global Skeleton Base */
+ .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 4px;
+  }
 
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
 
+  /* Container & Box Styles */
+  .skeleton-seat-map,
+  .skeleton-bus-info {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Row for Icons and Text */
+  .skeleton-row {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  /* Skeleton Icon */
+  .skeleton-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 5px;
+  }
+
+  /* Skeleton Text (under icons) */
+  .skeleton-text {
+    width: 80px;
+    height: 20px;
+    border-radius: 4px;
+  }
+
+  /* Skeleton for Seat Map Form Area */
+  .skeleton-form {
+    margin-top: 20px;
+    height: 200px;
+    border-radius: 6px;
+  }
+
+  /* Skeleton for Bus Info Area */
+  .skeleton-bus-info {
+    padding: 1rem;
+  }
+
+  /* Skeleton Tabs Container */
+  .skeleton-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  /* Each Skeleton Tab */
+  .skeleton-tab {
+    width: 100px;
+    height: 30px;
+    border-radius: 6px;
+  }
+
+  /* Skeleton Tab Content */
+  .skeleton-tab-content {
+    height: 150px;
+    border-radius: 6px;
+  }
+
+  /* Skeleton Button */
+  .skeleton-button {
+    width: 200px;
+    height: 40px;
+    margin: 10px auto;
+    border-radius: 6px;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .skeleton-icon {
+      width: 60px;
+      height: 60px;
+    }
+    .skeleton-text {
+      width: 70px;
+      height: 18px;
+    }
+    .skeleton-tab {
+      width: 80px;
+      height: 28px;
+    }
+    .skeleton-button {
+      width: 180px;
+      height: 38px;
+    }
+  }
 </style>
