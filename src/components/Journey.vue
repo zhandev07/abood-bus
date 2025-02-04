@@ -285,24 +285,17 @@
                         </div>
 
                         <div v-if="selectedBus && selectedBus.bus_id === bus.bus_id">
-                            <!-- When skeleton is active (loading state) -->
                             <div v-if="isSkeletonLoading" class="row seat-map-container">
-                                <!-- Left Section: Seat Map Skeleton -->
                                 <div class="col-12 col-md-6 mt-2">
                                 <div class="skeleton skeleton-seat-map mx-md-3 p-3 border rounded shadow-sm bg-white">
-                                    <!-- Icon/Text Row Skeleton -->
                                     <div class="skeleton-row">
-                                    <!-- Skeleton for first icon and text -->
                                     <div class="skeleton skeleton-icon"></div>
                                     <div class="skeleton skeleton-text"></div>
-                                    <!-- Skeleton for second icon and text -->
                                     <div class="skeleton skeleton-icon"></div>
                                     <div class="skeleton skeleton-text"></div>
-                                    <!-- Skeleton for third icon and text -->
                                     <div class="skeleton skeleton-icon"></div>
                                     <div class="skeleton skeleton-text"></div>
                                     </div>
-                                    <!-- Skeleton for the Seat Map Form -->
                                     <div class="skeleton skeleton-form"></div>
                                 </div>
                                 </div>
@@ -310,20 +303,15 @@
                                 <!-- Right Section: Bus Info Skeleton -->
                                 <div class="col-12 col-md-6 mt-2">
                                 <div class="skeleton skeleton-bus-info p-3 border rounded shadow-sm bg-light">
-                                    <!-- Skeleton for the Tabs -->
                                     <div class="skeleton skeleton-tabs">
                                     <div class="skeleton skeleton-tab"></div>
                                     <div class="skeleton skeleton-tab"></div>
                                     </div>
-                                    <!-- Skeleton for the Tab Content -->
                                     <div class="skeleton skeleton-tab-content"></div>
-                                    <!-- Skeleton for the Proceed Button -->
                                     <div class="skeleton skeleton-button"></div>
                                 </div>
                                 </div>
                             </div>
-
-                            <!-- Actual content once loading is complete -->
                             <div v-else class="row seat-map-container">
                             <div class="col-12 col-md-6 mt-2">
                                 <div class="seat-map mx-md-3 p-3 border rounded shadow-sm bg-white">
@@ -842,7 +830,7 @@
             }
 
             // console.log("Booking ticket for Bus:", bus);  
-            this.isLoading = true;  
+            // this.isLoading = true;  
             this.isSkeletonLoading = true;
             this.errorMessage = "";  
 
@@ -879,7 +867,7 @@
                 console.error("Network Error:", error);  
                 this.errorMessage = "Something went wrong, please try again.";  
             } finally {  
-                this.isLoading = false;  
+                // this.isLoading = false;  
                 this.isSkeletonLoading= false;
             }  
         },
