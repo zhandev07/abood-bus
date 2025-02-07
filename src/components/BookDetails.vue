@@ -230,7 +230,8 @@
         busId: this.$route.query.bus_id || '',
         scheduleId: this.$route.query.schedule_id || '',
         departure: this.$route.query.departure || "", 
-        destination: this.$route.query.destination || "", 
+        destination: this.$route.query.destination || "",
+        routeId: this.$route.query.route_id || '', 
         selectedSeatsData: {
           seat_id: this.$route.query.seat_id ? this.$route.query.seat_id.split(',') : [],
           booking_id: this.$route.query.booking_id ? this.$route.query.booking_id.split(',') : [],
@@ -273,6 +274,7 @@
       // console.log('Schedule ID:', this.scheduleId);
       // console.log("Departure:", this.departure);
       // console.log("Destination:", this.destination);
+      // console.log("routeId:", this.route_id );
 
       if (!this.busId || !this.scheduleId || this.selectedSeatsData.seat_id.length === 0) {
       this.$router.push({ name: "Home" });
@@ -284,93 +286,94 @@
 
     methods: {
       async fetchBookingDetails() {
-      const { busId, scheduleId } = this;
-      if (!busId || !scheduleId) {
-        this.$router.push({ name: 'Home' });
-        return;
-      }
-      
-      this.isLoading = true;
-      this.errorMessage = "";
-
-      try {
-        const response = await axios.post("https://aboodbus.co.tz/passenger/bus-chart", {
-          bus_id: busId,
-          schedule_id: scheduleId
-        }, {
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const result = response.data;
-        if (result.code === 200 && result.data) {
-          // console.log("Booking details:", result.data);
-          
-          this.data.busSeats = result.data.bus_seats || [];
-          this.data.bus_schedule = result.data.bus_schedule || {};
-          this.seatsLimit = result.data.seats_limit || 0;
-          this.fare = result.data.fare || 0;
-          
-          this.boardPoints = result.data.boarding_points.map(bp => ({ 
-            id: bp.id, 
-            name: `${bp.point_name} (${bp.eta})` 
-          }));
-          
-          this.dropPoints = result.data.dropping_points.map(dp => ({ 
-            id: dp.id, 
-            name: `${dp.point_name} (${dp.eta})` 
-          }));
-          
-          this.genderOptions = result.data.genders.map(g => ({ id: g.id, name: g.name }));
-          this.ageOptions = result.data.ages.map(a => ({ id: a.id, name: a.name }));
-          
-          // Get seat details
-          const selectedSeats = this.selectedSeatsData.seat_id.map(seatId => {
-            const seat = this.data.busSeats.find(s => s.bus_seat_id == seatId);
-            return seat ? { id: seat.bus_seat_id, name: seat.seat_name, holdStatus: seat.hold_status, bookingId: seat.booking_id } : null;
-          }).filter(seat => seat);
-
-          // Check if any seat is released
-          if (selectedSeats.some(seat => seat.holdStatus === 0)) {
-            this.$router.push({ name: 'Home' });
-            return;
-          }
-          
-          // Update ticket details
-          this.tickets = selectedSeats.map(seat => ({
-            seatNumber: seat.name, 
-            journeyDate: result.data.bus_schedule.departure_date || '',
-            departureTime: result.data.bus_schedule.departure_time || '',
-            bus_number: result.data.bus_schedule.bus || '',
-            payfare: result.data.fare || '',
-            boardPointId: null,
-            dropPointId: null,
-            gender: null,
-            age: null,
-            fullName: '',
-            phoneNumber: '',
-            bookingId: seat.bookingId
-          }));
-          // Store seat-wise fares
-          this.seatFares = selectedSeats.map(seat => ({
-            seatNumber: seat.name,
-            fare: this.fare, // Assume same fare for each seat
-          }));
-
-          // Update total payable amount
-          this.totalExclTax = this.seatFares.reduce((total, seat) => total + seat.fare, 0);
-          this.payableAmount = this.totalExclTax; 
-        } else {
-          console.error("Failed to fetch data:", result.message);
-          this.errorMessage = result.message || "Error fetching booking details.";
+        const { busId, scheduleId } = this;
+        if (!busId || !scheduleId) {
+          this.$router.push({ name: 'Home' });
+          return;
         }
-      } catch (error) {
-        console.error("Fetch error:", error.response || error);
-        this.errorMessage = error.response?.data?.message || "Failed to fetch booking details.";
-      } finally {
-        this.isLoading = false;
-      }
-    },
+        
+        this.isLoading = true;
+        this.errorMessage = "";
+
+        try {
+          const response = await axios.post("https://aboodbus.co.tz/passenger/bus-chart", {
+            bus_id: busId,
+            schedule_id: scheduleId
+          }, {
+            headers: { "Content-Type": "application/json" }
+          });
+
+          const result = response.data;
+          if (result.code === 200 && result.data) {
+            // console.log("Booking details:", result.data);
+            
+            this.data.busSeats = result.data.bus_seats || [];
+            this.data.bus_schedule = result.data.bus_schedule || {};
+            this.seatsLimit = result.data.seats_limit || 0;
+            this.fare = result.data.fare || 0;
+            
+            this.boardPoints = result.data.boarding_points.map(bp => ({ 
+              id: bp.id, 
+              name: `${bp.point_name} (${bp.eta})` 
+            }));
+            
+            this.dropPoints = result.data.dropping_points.map(dp => ({ 
+              id: dp.id, 
+              name: `${dp.point_name} (${dp.eta})` 
+            }));
+            
+            this.genderOptions = result.data.genders.map(g => ({ id: g.id, name: g.name }));
+            this.ageOptions = result.data.ages.map(a => ({ id: a.id, name: a.name }));
+            
+            // Get seat details
+            const selectedSeats = this.selectedSeatsData.seat_id.map(seatId => {
+              const seat = this.data.busSeats.find(s => s.bus_seat_id == seatId);
+              return seat ? { id: seat.bus_seat_id, name: seat.seat_name, holdStatus: seat.hold_status, bookingId: seat.booking_id } : null;
+            }).filter(seat => seat);
+
+            // Check if any seat is released
+            if (selectedSeats.some(seat => seat.holdStatus === 0)) {
+              this.$router.push({ name: 'Home' });
+              return;
+            }
+            
+            // Update ticket details
+            this.tickets = selectedSeats.map(seat => ({
+              seatNumber: seat.name, 
+              journeyDate: result.data.bus_schedule.departure_date || '',
+              departureTime: result.data.bus_schedule.departure_time || '',
+              bus_number: result.data.bus_schedule.bus || '',
+              payfare: result.data.fare || '',
+              boardPointId: null,
+              dropPointId: null,
+              gender: null,
+              age: null,
+              fullName: '',
+              phoneNumber: '',
+              bookingId: seat.bookingId
+            }));
+            // Store seat-wise fares
+            this.seatFares = selectedSeats.map(seat => ({
+              seatNumber: seat.name,
+              fare: this.fare, // Assume same fare for each seat
+            }));
+
+            // Update total payable amount
+            this.totalExclTax = this.seatFares.reduce((total, seat) => total + seat.fare, 0);
+            this.payableAmount = this.totalExclTax; 
+          } else {
+            console.error("Failed to fetch data:", result.message);
+            this.errorMessage = result.message || "Error fetching booking details.";
+          }
+        } catch (error) {
+          console.error("Fetch error:", error.response || error);
+          this.errorMessage = error.response?.data?.message || "Failed to fetch booking details.";
+        } finally {
+          this.isLoading = false;
+        }
+      },
     async submitForm() {
+      // Validate that all required fields are filled
       if (
         !this.mobilePaymentNumber ||
         !this.scheduleId ||
@@ -392,92 +395,101 @@
       const payload = {
         payment_mobile_number: this.mobilePaymentNumber,
         schedule_id: this.scheduleId,
+        sales_channel_id: "68768768768",
+        sub_route_id: 2323,
         bookings: this.tickets.map((ticket) => ({
           passenger_phone_number: ticket.phoneNumber,
+          sub_route_id: "13",
           booking_id: ticket.bookingId,
-          board_point_id: this.departure, 
-          dropping_point_id: this.destination, 
+          board_point_id: this.departure,
+          dropping_point_id: this.destination,
           age_id: ticket.age?.id,
           full_name: ticket.fullName,
           gender_id: ticket.gender?.id,
         })),
       };
 
-      this.isLoadingbutton = true;
+      this.isLoading = true;
 
       try {
         const response = await axios.post(
-          "https://aboodbus.co.tz/passenger/booking/seats-details",
+          "https://aboodbus.co.tz/passenger/v1.3/tickets-booking",
           payload,
-          { 
-            headers: { "Content-Type": "application/json" },
-          }
+          { headers: { "Content-Type": "application/json" } }
         );
 
         if (response.data.code === 200) {
+          // Update the booking details in Vuex.
+          // (Make sure you have an action/mutation named "updateBookingDetails" in your store.)
           this.$store.dispatch("updateBookingDetails", response.data.data.booking);
+
+          // Navigate to the SeatDetails page.
           this.$router.push({ name: "SeatDetails" });
         } else {
           alert(response.data.message || "Error submitting booking.");
         }
       } catch (error) {
         console.error("Booking submission error:", error);
-
         if (error.code === "ERR_NETWORK") {
-          alert("Network error! Please check your internet connection and try again.");
+          alert(
+            "Network error! Please check your internet connection and try again."
+          );
         } else {
-          alert(error.response?.data?.message || "An error occurred while submitting the booking.");
+          alert(
+            error.response?.data?.message ||
+              "An error occurred while submitting the booking."
+          );
         }
       } finally {
-        this.isLoadingbutton = false;
+        this.isLoading = false;
       }
     },
     async ghairiForm() {
-  this.isLoadingGhairi = true;
+      this.isLoadingGhairi = true;
 
-  // Extract booking IDs and convert to a plain array
-  const plainData = JSON.parse(JSON.stringify(this.selectedSeatsData));
-  const bookingIds = plainData.booking_id;
+      // Extract booking IDs and convert to a plain array
+      const plainData = JSON.parse(JSON.stringify(this.selectedSeatsData));
+      const bookingIds = plainData.booking_id;
 
-  // console.log("Selected booking IDs:", bookingIds);
+      // console.log("Selected booking IDs:", bookingIds);
 
-  if (bookingIds.length === 0) {
-    alert("No bookings selected.");
-    this.isLoadingGhairi = false;
-    return;
-  }
-
-  const payload = {
-    booking_ids: bookingIds,
-  };
-
-  // console.log("Payload for releasing seats:", payload);
-
-  try {
-    const response = await axios.post(
-      "https://aboodbus.co.tz/api/agents/release-seats",
-      payload,
-      {
-        headers: { "Content-Type": "application/json" },
+      if (bookingIds.length === 0) {
+        alert("No bookings selected.");
+        this.isLoadingGhairi = false;
+        return;
       }
-    );
 
-    // console.log("Response from release-seats API:", response);
+      const payload = {
+        booking_ids: bookingIds,
+      };
 
-    // Check if the HTTP status code is 200 (OK)
-    if (response.status === 200) {
-      // alert("Seats released successfully.");
-      this.$router.push({ name: "Home" });
-    } else {
-      alert("Error releasing seats. Please try again.");
-    }
-  } catch (error) {
-    console.error("Error releasing seats:", error);
-    alert(error.response?.data?.message || "An error occurred.");
-  } finally {
-    this.isLoadingGhairi = false;
-  }
-},
+      // console.log("Payload for releasing seats:", payload);
+
+      try {
+        const response = await axios.post(
+          "https://aboodbus.co.tz/api/agents/release-seats",
+          payload,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        // console.log("Response from release-seats API:", response);
+
+        // Check if the HTTP status code is 200 (OK)
+        if (response.status === 200) {
+          // alert("Seats released successfully.");
+          this.$router.push({ name: "Home" });
+        } else {
+          alert("Error releasing seats. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error releasing seats:", error);
+        alert(error.response?.data?.message || "An error occurred.");
+      } finally {
+        this.isLoadingGhairi = false;
+      }
+    },
     },
   };
 

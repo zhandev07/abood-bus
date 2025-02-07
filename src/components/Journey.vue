@@ -619,6 +619,7 @@
         departureId: null,
         destinationId: null, 
         busData: [], 
+        routeId: null,
         isLoading: false, 
         errorMessage: "",
         seatData: [], 
@@ -780,6 +781,8 @@
         async fetchBusData() {
             this.isLoading = true;
             this.errorMessage = ""; 
+            this.routeId = null;
+
             const formData = new FormData();
             formData.append("boarding_city_id", this.departureId);
             formData.append("dropping_city_id", this.destinationId);
@@ -802,6 +805,7 @@
                     this.busData = [];
                     return;
                 }
+                this.routeId = result.data.route_id || null;
 
                 this.busData = result.data.bus_schedules || [];
                 
@@ -1031,6 +1035,7 @@
                 seat_id: this.selectedSeatIds.join(","),
                 departure: this.selectedDeparture,
                 destination: this.selectedDestination,
+                route_id: this.routeId,
             },
         });
     } catch (error) {
