@@ -372,78 +372,79 @@
           this.isLoading = false;
         }
       },
-    async submitForm() {
-      // Validate that all required fields are filled
-      if (
-        !this.mobilePaymentNumber ||
-        !this.scheduleId ||
-        !this.departure ||
-        !this.destination ||
-        this.tickets.some(
-          (ticket) =>
-            !ticket.phoneNumber ||
-            !ticket.bookingId ||
-            !ticket.age ||
-            !ticket.fullName ||
-            !ticket.gender
-        )
-      ) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-
-      const payload = {
-        payment_mobile_number: this.mobilePaymentNumber,
-        schedule_id: this.scheduleId,
-        sales_channel_id: "68768768768",
-        sub_route_id: 2323,
-        bookings: this.tickets.map((ticket) => ({
-          passenger_phone_number: ticket.phoneNumber,
-          sub_route_id: "13",
-          booking_id: ticket.bookingId,
-          board_point_id: this.departure,
-          dropping_point_id: this.destination,
-          age_id: ticket.age?.id,
-          full_name: ticket.fullName,
-          gender_id: ticket.gender?.id,
-        })),
-      };
-
-      this.isLoading = true;
-
-      try {
-        const response = await axios.post(
-          "https://aboodbus.co.tz/passenger/v1.3/tickets-booking",
-          payload,
-          { headers: { "Content-Type": "application/json" } }
-        );
-
-        if (response.data.code === 200) {
-          // Update the booking details in Vuex.
-          // (Make sure you have an action/mutation named "updateBookingDetails" in your store.)
-          this.$store.dispatch("updateBookingDetails", response.data.data.booking);
-
-          // Navigate to the SeatDetails page.
-          this.$router.push({ name: "SeatDetails" });
-        } else {
-          alert(response.data.message || "Error submitting booking.");
+      async submitForm() {
+        if (
+          !this.mobilePaymentNumber ||
+          !this.scheduleId ||
+          !this.departure ||
+          !this.destination ||
+          this.tickets.some(
+            (ticket) =>
+              !ticket.phoneNumber ||
+              !ticket.bookingId ||
+              !ticket.age ||
+              !ticket.fullName ||
+              !ticket.gender
+          )
+        ) {
+          alert("Please fill in all required fields.");
+          return;
         }
-      } catch (error) {
-        console.error("Booking submission error:", error);
-        if (error.code === "ERR_NETWORK") {
-          alert(
-            "Network error! Please check your internet connection and try again."
+
+        const payload = {
+          payment_mobile_number: this.mobilePaymentNumber,
+          schedule_id: "83183",
+           // schedule_id: this.scheduleId,
+          sales_channel_id: "68768768768",
+          sub_route_id: 2323,
+          bookings: this.tickets.map((ticket) => ({
+            passenger_phone_number: ticket.phoneNumber,
+            sub_route_id: "13",
+            booking_id: 4881694,
+             // booking_id: ticket.bookingId,
+            board_point_id: this.departure,
+            dropping_point_id: this.destination,
+            age_id: ticket.age?.id,
+            full_name: ticket.fullName,
+            gender_id: ticket.gender?.id,
+          })),
+        };
+
+        this.isLoading = true;
+
+        try {
+          const response = await axios.post(
+            "https://aboodbus.co.tz/passenger/v1.3/tickets-booking",
+            payload,
+            { headers: { "Content-Type": "application/json" } }
           );
-        } else {
-          alert(
-            error.response?.data?.message ||
-              "An error occurred while submitting the booking."
-          );
+
+          console.log("Server Response:", response.data);
+
+          // Correctly checking if the response status is 200
+          if (response.data.status === 200) {
+            // Update Vuex store with booking details
+            this.$store.dispatch("updateBookingDetails", response.data.data);
+
+            // Redirect to the SeatDetails page
+            this.$router.push({ name: "SeatDetails" });
+          } else {
+            alert(response.data.message || "Error submitting booking.");
+          }
+        } catch (error) {
+          console.error("Booking submission error:", error);
+
+          if (error.code === "ERR_NETWORK") {
+            alert("Network error! Please check your internet connection.");
+          } else {
+            alert(error.response?.data?.message || "An error occurred.");
+          }
+        } finally {
+          this.isLoading = false;
         }
-      } finally {
-        this.isLoading = false;
-      }
-    },
+      },
+
+
     async ghairiForm() {
       this.isLoadingGhairi = true;
 
