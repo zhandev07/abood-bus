@@ -393,15 +393,15 @@
 
         const payload = {
           payment_mobile_number: this.mobilePaymentNumber,
-          schedule_id: "83183",
-           // schedule_id: this.scheduleId,
+          // schedule_id: "83183",
+           schedule_id: this.scheduleId,
           sales_channel_id: "68768768768",
           sub_route_id: 2323,
           bookings: this.tickets.map((ticket) => ({
             passenger_phone_number: ticket.phoneNumber,
             sub_route_id: "13",
-            booking_id: 4881694,
-             // booking_id: ticket.bookingId,
+            // booking_id: 4881694,
+             booking_id: ticket.bookingId,
             board_point_id: this.departure,
             dropping_point_id: this.destination,
             age_id: ticket.age?.id,
@@ -421,12 +421,9 @@
 
           console.log("Server Response:", response.data);
 
-          // Correctly checking if the response status is 200
           if (response.data.status === 200) {
-            // Update Vuex store with booking details
             this.$store.dispatch("updateBookingDetails", response.data.data);
 
-            // Redirect to the SeatDetails page
             this.$router.push({ name: "SeatDetails" });
           } else {
             alert(response.data.message || "Error submitting booking.");

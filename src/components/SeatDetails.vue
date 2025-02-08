@@ -2,9 +2,9 @@
   <section id="booking-details" class="booking-details card-text" style="padding: 20px;">
     <div class="container">
       <div v-if="isSkeletonLoading" class="skeleton-loading">
-        <div class="skeleton-bus-list-content">
-          <!-- Skeleton for Booking Details (Left side) -->
-          <div class="skeleton-section skeleton-booking-details">
+        <div class="bus-list-content">
+          <div class="row">
+          <div class="col-md-6 col-sm-12 skeleton-booking-details">
             <div class="skeleton-title"></div>
             <div class="skeleton-price-box">
               <div class="skeleton-price"></div>
@@ -16,8 +16,7 @@
             </ul>
             <div class="skeleton-bottom-box"></div>
           </div>
-          <!-- Skeleton for Payment Instructions (Right side) -->
-          <div class="skeleton-section skeleton-payment-instructions">
+          <div class="col-md-6 col-sm-12 skeleton-payment-instructions">
             <div class="skeleton-thumbnail"></div>
             <div class="skeleton-caption">
               <div class="skeleton-heading"></div>
@@ -29,10 +28,10 @@
               <div class="skeleton-paragraph"></div>
             </div>
           </div>
+          </div>
         </div>
       </div>
       <div v-else class="bus-list-content">
-        <!-- If payment is successful, show the success message -->
         <div v-if="paymentSuccess" class="row success-message">
           <div class="col-md-12 col-sm-12">
             <div class="alert alert-success" role="alert">
@@ -44,8 +43,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Otherwise, show the booking details and payment instructions -->
         <div v-else>
           <div class="row">
             <!-- Left side: Booking Details -->
@@ -184,30 +181,49 @@ export default {
     },
   },
   created() {
+    console.log("Booking details from state (created hook):", this.bookingDetails);
+
     if (this.bookingDetails && this.bookingDetails.payment_reference) {
-      setTimeout(this.checkPaymentStatus, 30000);
+      setTimeout(() => {
+        console.log("Timeout reached. Initiating payment status check...");
+        this.checkPaymentStatus();
+      }, 30000);
     } else {
+      console.error(
+        "Booking details or payment_reference is not available:",
+        this.bookingDetails
+      );
       this.isSkeletonLoading = false;
     }
   },
   methods: {
     async checkPaymentStatus() {
+      console.log("In checkPaymentStatus. Current bookingDetails:", this.bookingDetails);
+
+      
+      if (!this.bookingDetails || !this.bookingDetails.payment_reference) {
+        console.error("Payment reference not found in bookingDetails.");
+        return;
+      }
+
+      const paymentReference = this.bookingDetails.payment_reference;
+      console.log("Using payment_reference:", paymentReference);
+
       try {
-        const paymentReference = this.formattedBookingDetails.payment_reference;
         const response = await axios.post(
           "https://aboodbus.co.tz/passenger/v1.3/tickets-booking/payment-confirm/",
           { payment_reference: paymentReference }
         );
+
         console.log("Payment status check response:", response);
-        if (
-          response.data &&
-          response.data.data &&
-          response.data.data.status === "PAID"
-        ) {
+
+        // Check if the response data indicates payment is PAID.
+        if (response.data?.data?.status === "PAID") {
           this.paymentSuccess = true;
-          // this.$store.dispatch("updateBookingDetails", response.data.data);
+          console.log("Payment status: PAID");
         } else {
           this.paymentSuccess = false;
+          console.log("Payment status is not PAID. Response data:", response.data);
         }
       } catch (error) {
         console.error("Payment status check error:", error);
@@ -218,6 +234,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .pricing-error,
