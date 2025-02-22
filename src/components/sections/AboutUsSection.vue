@@ -1,5 +1,5 @@
 <template>
-    <div id="about-us">
+    <div id="about-us" data-aos="fade-up">
       <!-- Start Our Services -->
       <div class="container-fluid">
         <div class="services-section">

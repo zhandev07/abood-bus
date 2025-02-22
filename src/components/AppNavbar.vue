@@ -1,5 +1,5 @@
 <template>
-  <header id="navigation">
+  <header id="navigation" data-aos="fade-down">
     <nav class="navbar main-nav navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
         <router-link class="navbar-brand" to="/#home">

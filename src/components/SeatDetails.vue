@@ -217,7 +217,6 @@ export default {
 
         console.log("Payment status check response:", response);
 
-        // Check if the response data indicates payment is PAID.
         if (response.data?.data?.status === "PAID") {
           this.paymentSuccess = true;
           console.log("Payment status: PAID");

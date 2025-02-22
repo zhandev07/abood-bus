@@ -1,5 +1,5 @@
 <template>
-  <div id="our-services">
+  <div id="our-services" data-aos="fade-up">
     <div class="container">
       <div class="section-title">
         <h2>Our Services</h2>
@@ -9,12 +9,19 @@
         <!-- Left Section -->
         <div class="service-card">
           <div class="abood-image-section">
-            <img src="@/assets/images/delivery1.jpg" alt="Courier Services" class="img-fluid" />
+            <img
+              src="@/assets/images/delivery1.jpg"
+              alt="Courier Services"
+              class="img-fluid"
+            />
           </div>
           <div class="abood-text-section">
             <h3 class="text-uppercase">Courier Services</h3>
             <p>
-              Make your deliveries easier with our new courier service! Our experienced drivers and top-notch vehicles ensure that your packages are handled with care and reach their destination safely and on time.
+              Make your deliveries easier with our new courier service! Our
+              experienced drivers and top-notch vehicles ensure that your
+              packages are handled with care and reach their destination safely
+              and on time.
             </p>
             <!-- <router-link to="/book-now" class="btn btn-custom">Book Now</router-link> -->
           </div>
@@ -23,12 +30,18 @@
         <!-- Middle Section -->
         <div class="service-card">
           <div class="abood-image-section">
-            <img src="@/assets/images/DJI_20241029205045_0195_D-Enhanced-NR.jpg" alt="Tenders" class="img-fluid" />
+            <img
+              src="@/assets/images/DJI_20241029205045_0195_D-Enhanced-NR.jpg"
+              alt="Tenders"
+              class="img-fluid"
+            />
           </div>
           <div class="abood-text-section">
             <h3 class="text-uppercase">Tenders</h3>
             <p>
-              Need a bus for a special event or group trip? Our intercity bus company offers bus hire services for all your transportation needs.
+              Need a bus for a special event or group trip? Our intercity bus
+              company offers bus hire services for all your transportation
+              needs.
             </p>
             <!-- <router-link to="/book-now" class="btn btn-custom">Book Now</router-link> -->
           </div>
@@ -37,12 +50,18 @@
         <!-- Right Section -->
         <div class="service-card">
           <div class="abood-image-section">
-            <img src="@/assets/images/luggage.png" alt="Luggage Services" class="img-fluid" />
+            <img
+              src="@/assets/images/luggage.png"
+              alt="Luggage Services"
+              class="img-fluid"
+            />
           </div>
           <div class="abood-text-section">
             <h3 class="text-uppercase">Luggage Services</h3>
             <p>
-              Travel with ease and leave the heavy lifting to us! Our luggage transportation service ensures your belongings are moved safely and efficiently.
+              Travel with ease and leave the heavy lifting to us! Our luggage
+              transportation service ensures your belongings are moved safely
+              and efficiently.
             </p>
             <!-- <router-link to="/book-now" class="btn btn-custom">Book Now</router-link> -->
           </div>
@@ -54,7 +73,7 @@
 
 <script>
 export default {
-  name: 'OtherservicesSection',
+  name: "OtherservicesSection",
 };
 </script>
 
@@ -103,7 +122,6 @@ h2 {
   transition: transform 0.3s ease-in-out;
 }
 
-
 .abood-text-section {
   padding: 20px;
   /* background-color: #f7f7f7; */
@@ -124,7 +142,7 @@ h2 {
 }
 
 .btn-custom {
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
   padding: 10px 20px;
   text-decoration: none;
