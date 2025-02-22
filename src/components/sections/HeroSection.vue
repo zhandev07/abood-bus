@@ -244,17 +244,12 @@
                             </svg>
                             Date
                           </label>
-                          <!-- <input
+                          <input
                             type="date"
                             v-model="date"
                             class="form-control"
                             :min="minDate"
                             required
-                          /> -->
-                          <flat-pickr
-                            v-model="date"
-                            :config="dateConfig"
-                            class="form-control"
                           />
                         </div>
 
@@ -302,11 +297,11 @@
 </template>
 <script>
 import axios from "axios";
-import flatPickr from "vue-flatpickr-component";
-import "flatpickr/dist/flatpickr.css";
+// import flatPickr from "vue-flatpickr-component";
+// import "flatpickr/dist/flatpickr.css";
 
 export default {
-  components: { flatPickr },
+  // components: { flatPickr },
   data() {
     return {
       departure: "",
@@ -323,10 +318,10 @@ export default {
       isLoadingDeparture: false,
       isLoadingDestination: false,
       minDate: "",
-      dateConfig: {
-        minDate: new Date(),
-        dateFormat: "Y-m-d",
-      },
+      // dateConfig: {
+      //   minDate: new Date(),
+      //   dateFormat: "Y-m-d",
+      // },
     };
   },
   methods: {
@@ -447,13 +442,17 @@ export default {
       }, 300);
     },
   },
-
   mounted() {
     this.fetchDepartureCities();
-    // this.minDate = new Date().toISOString().split("T")[0];
+    this.minDate = new Date().toISOString().split("T")[0];
     this.date = this.minDate;
-    this.date = new Date().toISOString().split("T")[0];
   },
+  // mounted() {
+  //   this.fetchDepartureCities();
+  //   // this.minDate = new Date().toISOString().split("T")[0];
+  //   this.date = this.minDate;
+  //   this.date = new Date().toISOString().split("T")[0];
+  // },
 };
 </script>
 <style scoped>
