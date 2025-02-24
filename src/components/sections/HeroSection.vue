@@ -297,11 +297,8 @@
 </template>
 <script>
 import axios from "axios";
-// import flatPickr from "vue-flatpickr-component";
-// import "flatpickr/dist/flatpickr.css";
 
 export default {
-  // components: { flatPickr },
   data() {
     return {
       departure: "",

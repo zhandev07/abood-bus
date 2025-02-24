@@ -1,155 +1,191 @@
 <template>
-  <section id="booking-details" class="booking-details card-text" style="padding: 20px;">
-    <div class="container">
-      <div v-if="isSkeletonLoading" class="skeleton-loading">
-        <div class="bus-list-content">
-          <div class="row">
-          <div class="col-md-6 col-sm-12 skeleton-booking-details">
-            <div class="skeleton-title"></div>
-            <div class="skeleton-price-box">
-              <div class="skeleton-price"></div>
-            </div>
-            <ul class="skeleton-options">
-              <li v-for="n in 5" :key="n">
-                <div class="skeleton-option"></div>
-              </li>
-            </ul>
-            <div class="skeleton-bottom-box"></div>
-          </div>
-          <div class="col-md-6 col-sm-12 skeleton-payment-instructions">
-            <div class="skeleton-thumbnail"></div>
-            <div class="skeleton-caption">
-              <div class="skeleton-heading"></div>
-              <ol>
-                <li v-for="n in 8" :key="n">
-                  <div class="skeleton-list-item"></div>
-                </li>
-              </ol>
-              <div class="skeleton-paragraph"></div>
-            </div>
-          </div>
-          </div>
+  <section
+    id="booking-details"
+    class="booking-details card-text"
+    style="padding: 20px"
+  >
+    <div>
+      <div v-if="isLoading" class="loading-overlay">
+        <div class="loading-card">
+          <img
+            src="@/assets/images/Aboodloader.gif"
+            alt="Loading..."
+            class="loading-gif"
+          />
         </div>
       </div>
-      <div v-else class="bus-list-content">
-        <div v-if="paymentSuccess" class="row success-message">
-          <div class="col-md-12 col-sm-12">
-            <div class="alert alert-success" role="alert">
-              <h3 class="alert-heading">Payment Successful!</h3>
-              <p>
-                Your payment has been successfully processed. Your ticket details
-                will be sent to your phone shortly.
-              </p>
+      <div v-else class="container">
+        <div class="bus-list-content">
+          <div v-if="paymentSuccess" class="row success-message">
+            <div class="col-md-12 col-sm-12">
+              <div class="alert alert-success" role="alert">
+                <h3 class="alert-heading">Payment Successful!</h3>
+                <p>
+                  Your payment has been successfully processed. Your ticket
+                  details will be sent to your phone shortly.
+                </p>
+              </div>
+
+              <div v-if="ticketData" class="row">
+                <div class="col-md-6 col-lg-4 mx-auto">
+                  <div class="ticket-details card p-3 text-center">
+                    <h4>Your Ticket</h4>
+                    <img
+                      :src="
+                        'data:' +
+                        ticketData.ticketDataType +
+                        ';base64,' +
+                        ticketData.ticketImage
+                      "
+                      alt="Ticket Image"
+                      class="img-fluid ticket-img"
+                    />
+                    <a
+                      :href="ticketData.ticketUrl"
+                      target="_blank"
+                      class="btn btn-primary mt-2"
+                    >
+                      Download Ticket
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-else>
-          <div class="row">
-            <!-- Left side: Booking Details -->
-            <div class="col-md-6 col-sm-12">
-              <div
-                v-if="bookingDetails && Object.keys(bookingDetails).length"
-                class="pricing-error"
-              >
-                <div class="title">
-                  <a href="/shop"><u>YOUR BOOKING DETAILS:</u></a>
-                </div>
-                <div class="price-box">
-                  <div class="price">
-                    {{ bookingDetails.origin_city }} - {{ bookingDetails.destination_city }}
-                    <span>(via :{{ bookingDetails.via }})</span>
-                  </div>
-                </div>
-                <ul class="options">
-                  <li class="active">
-                    <span><i class="fa fa-check"></i></span>BUS #:
-                    <a style="color:#000;font-weight: bold">
-                      {{ bookingDetails.bus }} ({{ bookingDetails.bus_class }})
-                    </a>
-                  </li>
-                  <li class="active">
-                    <span><i class="fa fa-check"></i></span>TRIP DATE:
-                    <a style="color:#000;font-weight: bold">
-                      {{ bookingDetails.departure_date }}
-                    </a>
-                  </li>
-                  <li class="active">
-                    <span><i class="fa fa-check"></i></span>REPORTING TIME:
-                    <a style="color:#000;font-weight: bold">
-                      {{ bookingDetails.reporting_time }}
-                    </a>
-                  </li>
-                  <li class="active">
-                    <span><i class="fa fa-check"></i></span>DEPARTURE TIME:
-                    <a style="color:#000;font-weight: bold">
-                      {{ bookingDetails.departure_time_in_en }}
-                    </a>
-                  </li>
-                  <li class="active">
-                    <span><i class="fa fa-check"></i></span>Status:
-                    <a style="color:#000;font-weight: bold">
-                      {{ bookingDetails.status }}
-                    </a>
-                  </li>
-                </ul>
-                <div class="bottom-box">
-                  <a class="more">Booking has {{ bookingDetails.no_of_tickets }} Tickets</a>
-                  <div class="rating-box">
-                    <div style="width: 100%" class="rating"></div>
-                  </div>
-                  <a class="btn btn-danger" style="font-size: 10px">
-                    Payment is to be done within 10 minutes.
-                  </a>
-                </div>
-              </div>
-              <div v-else>
-                <p style="color: red; font-weight: bold;">No booking details available.</p>
-              </div>
-            </div>
 
-            <!-- Right side: Payment Instructions -->
-            <div class="col-md-6 col-sm-12">
-              <div class="thumbnail">
+          <div v-else>
+            <div class="row">
+              <!-- Left side: Booking Details -->
+              <div class="col-md-6 col-sm-12">
                 <div
-                  class="image-container"
-                  style="display: flex; justify-content: center; align-items: center; height: 100%;"
+                  v-if="bookingDetails && Object.keys(bookingDetails).length"
+                  class="pricing-error"
                 >
-                  <img src="/images/mpesa_logo.png" alt="M-Pesa Logo" />
+                  <div class="title">
+                    <a href="/Home"><u>YOUR BOOKING DETAILS:</u></a>
+                  </div>
+                  <div class="price-box">
+                    <div class="price">
+                      Payment via: <strong>{{ bookingDetails.mno }}</strong>
+                      <br />
+                      Mobile Number:
+                      <strong>{{
+                        bookingDetails.payment_mobile_number
+                      }}</strong>
+                      <br />
+                      Fare: <strong>Tsh {{ bookingDetails.fare }}</strong>
+                    </div>
+                  </div>
+                  <ul class="options">
+                    <li class="active">
+                      <span><i class="fa fa-check"></i></span>
+                      Payment Reference:
+                      <a style="color: #000; font-weight: bold">
+                        {{ bookingDetails.payment_reference }}
+                      </a>
+                    </li>
+                    <li class="active">
+                      <span><i class="fa fa-check"></i></span>
+                      No of Tickets:
+                      <a style="color: #000; font-weight: bold">
+                        {{ bookingDetails.no_of_tickets }}
+                      </a>
+                    </li>
+                    <li class="active">
+                      <span><i class="fa fa-check"></i></span>
+                      Status:
+                      <a style="color: #000; font-weight: bold">
+                        {{ bookingDetails.status }}
+                      </a>
+                    </li>
+                  </ul>
+                  <div class="bottom-box">
+                    <a class="more">
+                      Booking has {{ bookingDetails.no_of_tickets }} Ticket(s)
+                    </a>
+                    <div class="rating-box">
+                      <div style="width: 100%" class="rating"></div>
+                    </div>
+                    <a class="btn btn-danger" style="font-size: 10px">
+                      Payment is to be done within 10 minutes.
+                    </a>
+                  </div>
                 </div>
-                <div class="caption">
-                  <h3>Lipia Sasa:</h3>
-                  <ol>
-                    <li><b>1.</b> Piga <b><em>*150*00#</em></b></li>
-                    <li><b>2.</b> Chagua 4 - Lipa kwa M-pesa</li>
-                    <li>
-                      <b>3.</b> Chagua 4 - Weka Nambari ya Kampuni.
-                      ({{ paymentDetails.companyNumber }})
-                    </li>
-                    <li><b>4.</b> Weka <b>{{ paymentDetails.paymentCode }}</b>.</li>
-                    <li>
-                      <b>5.</b> Weka Namba ya Kumbukumbu ya Malipo.
-                      <br />
-                      <b><em>(Kumbukumbu # ni )</em></b>
-                    </li>
-                    <li>
-                      <b>6.</b> Weka Kiasi.
-                      <br />
-                      <b><em>(Weka kiasi hiki {{ bookingDetails.fare }})</em></b>
-                    </li>
-                    <li><b>7.</b> Weka Namba ya Siri.</li>
-                    <li><b>8.</b> Bonyeza 1 Kukamilisha Malipo.</li>
-                  </ol>
-                  <p style="font-weight: bold">
-                    <em>
-                      Utapata SMS ya Uthibitisho wa malipo kutoka mtandao husika na SMS ya Ticket yako
-                      itatumwa kwenye namba uliyoweka ya Abira yenye jina ABOOD BUS
-                    </em>
+                <div v-else>
+                  <p style="color: red; font-weight: bold">
+                    No booking details available.
                   </p>
                 </div>
               </div>
+
+              <!-- Right side: Payment Instructions -->
+              <div class="col-md-6 col-sm-12">
+                <div class="thumbnail">
+                  <div
+                    class="image-container"
+                    style="
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      height: 100%;
+                    "
+                  >
+                    <img src="/images/mpesa_logo.png" alt="M-Pesa Logo" />
+                  </div>
+                  <div class="caption">
+                    <h3>Lipia Sasa:</h3>
+                    <ol>
+                      <li>
+                        <b>1.</b> Piga <b><em>*150*00#</em></b>
+                      </li>
+                      <li><b>2.</b> Chagua 4 - Lipa kwa M-pesa</li>
+                      <li>
+                        <b>3.</b> Chagua 4 - Weka Nambari ya Kampuni. (<strong
+                          >{{ paymentDetails.companyNumber }}</strong
+                        >)
+                      </li>
+                      <li>
+                        <b>4.</b> Weka
+                        <strong>{{ paymentDetails.paymentCode }}</strong
+                        >.
+                      </li>
+                      <li>
+                        <b>5.</b> Weka Namba ya Kumbukumbu ya Malipo.
+                        <br />
+                        <b
+                          ><em
+                            >(Kumbukumbu # ni ){{
+                              bookingDetails.payment_reference
+                            }}</em
+                          ></b
+                        >
+                      </li>
+                      <li>
+                        <b>6.</b> Weka Kiasi.
+                        <br />
+                        <b
+                          ><em
+                            >(Weka kiasi hiki Tsh {{ bookingDetails.fare }})</em
+                          ></b
+                        >
+                      </li>
+                      <li><b>7.</b> Weka Namba ya Siri.</li>
+                      <li><b>8.</b> Bonyeza 1 Kukamilisha Malipo.</li>
+                    </ol>
+                    <p style="font-weight: bold">
+                      <em>
+                        Utapata SMS ya Uthibitisho wa malipo kutoka mtandao
+                        husika na SMS ya Ticket yako itatumwa kwenye namba
+                        uliyoweka ya Abira yenye jina ABOOD BUS.
+                      </em>
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <!-- End of bus-list-content -->
       </div>
     </div>
   </section>
@@ -164,25 +200,26 @@ export default {
   data() {
     return {
       paymentSuccess: false,
-      isSkeletonLoading: true,
+      isLoading: true,
+      ticketData: null,
     };
   },
   computed: {
     ...mapGetters({
-      bookingDetails: "bookingDetails", 
+      bookingDetails: "bookingDetails",
     }),
     paymentDetails() {
       return {
         companyNumber: "993355",
         paymentCode: "993355",
-        referenceNumber: "ABDWV1RNFQML",
-        amount: "50,000",
       };
     },
   },
   created() {
-    console.log("Booking details from state (created hook):", this.bookingDetails);
-
+    console.log(
+      "Booking details from state (created hook):",
+      this.bookingDetails
+    );
     if (this.bookingDetails && this.bookingDetails.payment_reference) {
       setTimeout(() => {
         console.log("Timeout reached. Initiating payment status check...");
@@ -193,47 +230,58 @@ export default {
         "Booking details or payment_reference is not available:",
         this.bookingDetails
       );
-      this.isSkeletonLoading = false;
+      this.isLoading = false;
     }
   },
   methods: {
     async checkPaymentStatus() {
-      console.log("In checkPaymentStatus. Current bookingDetails:", this.bookingDetails);
+      console.log(
+        "In checkPaymentStatus. Current bookingDetails:",
+        this.bookingDetails
+      );
 
-      
       if (!this.bookingDetails || !this.bookingDetails.payment_reference) {
         console.error("Payment reference not found in bookingDetails.");
         return;
       }
 
       const paymentReference = this.bookingDetails.payment_reference;
+      // For testing
+      // const paymentReference = "ABDWZYBSZ3Z4Y";
+
       console.log("Using payment_reference:", paymentReference);
 
       try {
         const response = await axios.post(
-          "https://aboodbus.co.tz/passenger/v1.3/tickets-booking/payment-confirm/",
+          "https://aboodbus.co.tz/passenger/v1.3/tickets-booking/payment-confirm",
           { payment_reference: paymentReference }
         );
 
         console.log("Payment status check response:", response);
-
-        if (response.data?.data?.status === "PAID") {
+        if (
+          response.data?.code === 200 &&
+          response.data.data &&
+          response.data.data.length
+        ) {
           this.paymentSuccess = true;
+          this.ticketData = response.data.data[0];
           console.log("Payment status: PAID");
         } else {
           this.paymentSuccess = false;
-          console.log("Payment status is not PAID. Response data:", response.data);
+          console.log(
+            "Payment status is not PAID. Response data:",
+            response.data
+          );
         }
       } catch (error) {
         console.error("Payment status check error:", error);
       } finally {
-        this.isSkeletonLoading = false;
+        this.isLoading = false;
       }
     },
   },
 };
 </script>
-
 
 <style scoped>
 .pricing-error,
@@ -246,7 +294,7 @@ export default {
 }
 
 .success-message {
-  background-color: #28a745; 
+  /* background-color: #28a745; */
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -302,7 +350,7 @@ export default {
 }
 
 .pricing-error .btn-danger {
-  background-color: #dc3545!important;
+  background-color: #dc3545 !important;
   border: none;
   color: white;
   padding: 8px 16px;
@@ -315,10 +363,11 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .pricing-error, .success-message {
+  .pricing-error,
+  .success-message {
     padding: 10px;
   }
-  
+
   .pricing-error ul.options li {
     font-size: 14px;
   }
@@ -359,7 +408,12 @@ export default {
   left: -150px;
   height: 100%;
   width: 150px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   animation: loading 1.5s infinite;
 }
 
@@ -451,4 +505,54 @@ export default {
   margin-top: 10px;
 }
 
+/* Overlay covering the entire viewport */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Centered Card */
+.loading-card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 300px;
+  /* height: 200px; */
+}
+
+/* GIF Loader Styling */
+.loading-gif {
+  width: 100px; /* Adjust size as needed */
+  height: auto;
+  /* margin-bottom: 10px; */
+}
+
+/* Loading Text */
+.loading-text {
+  font-size: 16px;
+  color: #333;
+}
+.ticket-details {
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.ticket-img {
+  max-width: 100%; /* Ensures it never overflows */
+  height: auto; /* Keeps aspect ratio */
+  border-radius: 5px;
+}
 </style>

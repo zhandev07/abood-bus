@@ -555,12 +555,13 @@ export default {
         payment_mobile_number: this.mobilePaymentNumber,
         schedule_id: "83183",
         // schedule_id: this.scheduleId,
-        sales_channel_id: "68768768768",
-        sub_route_id: this.sub_route_id,
+        // sales_channel_id: "68768768768",
+        // sub_route_id: this.sub_route_id,
+        sub_route_id: 2323,
         bookings: this.tickets.map((ticket) => ({
           passenger_phone_number: ticket.phoneNumber,
-          // sub_route_id: "13",
-          sub_route_id: this.sub_route_id,
+          sub_route_id: "13",
+          // sub_route_id: this.sub_route_id,
           // booking_id: 4881694,
           booking_id: ticket.bookingId,
           board_point_id: this.departure,
@@ -620,7 +621,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://aboodbus.co.tz/api/agents/release-seats",
+          "https://aboodbus.co.tz/passenger/schedules/release-seats",
           payload,
           {
             headers: { "Content-Type": "application/json" },
